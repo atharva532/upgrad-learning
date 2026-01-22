@@ -1,0 +1,203 @@
+# =============================================================================
+# UpGrad Learning CI Pipeline
+# =============================================================================
+# Production-grade CI for Turborepo monorepo with pnpm
+# Triggers: PRs to main/develop, pushes to main/develop/feature/*
+# Jobs: quality → tests (parallel) → build
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# Cancel redundant runs on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Lock Node and pnpm versions for reproducibility
+  NODE_VERSION: '22'
+  PNPM_VERSION: '9.0.0'
+
+jobs:
+  # ===========================================================================
+  # Quality Checks
+  # ===========================================================================
+  # Runs lint, format check, and type-check in parallel via Turbo
+  # Fails fast on any code quality issue before running expensive tests
+  # ===========================================================================
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Run all quality checks via Turbo for parallel execution
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format Check
+        run: pnpm format:check
+
+      - name: Type Check
+        run: pnpm type-check
+
+  # ===========================================================================
+  # Backend Tests
+  # ===========================================================================
+  # Runs Vitest tests for the backend API
+  # Uploads coverage report as artifact
+  # ===========================================================================
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Generate Prisma client (required even if tests don't use DB)
+      - name: Generate Prisma Client
+        run: pnpm --filter @upgrad/backend db:generate
+
+      - name: Run Backend Tests
+        run: pnpm --filter @upgrad/backend test:coverage
+
+      - name: Upload Backend Coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: apps/backend/coverage
+          retention-days: 7
+
+  # ===========================================================================
+  # Frontend Tests
+  # ===========================================================================
+  # Runs Vitest tests with jsdom for React components
+  # Uploads coverage report as artifact
+  # ===========================================================================
+  test-frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Frontend Tests
+        run: pnpm --filter @upgrad/frontend test:coverage
+
+      - name: Upload Frontend Coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: apps/frontend/coverage
+          retention-days: 7
+
+  # ===========================================================================
+  # Build
+  # ===========================================================================
+  # Builds all packages to verify compilation succeeds
+  # Only runs after tests pass
+  # ===========================================================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [test-backend, test-frontend]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Generate Prisma client before build
+      - name: Generate Prisma Client
+        run: pnpm --filter @upgrad/backend db:generate
+
+      - name: Build All
+        run: pnpm build
+
+      # Upload build artifacts for potential deployment
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            apps/backend/dist
+            apps/frontend/dist
+          retention-days: 7
