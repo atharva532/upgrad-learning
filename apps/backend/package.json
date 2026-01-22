@@ -10,6 +10,9 @@
     "lint": "eslint . --ext .ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio"
@@ -24,8 +27,12 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "^4.0.17",
     "prisma": "^6.0.0",
+    "supertest": "^7.2.2",
     "tsx": "^4.19.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^4.0.17"
   }
 }
