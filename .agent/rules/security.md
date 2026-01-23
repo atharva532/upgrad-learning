@@ -27,7 +27,9 @@ These actions are NEVER allowed:
 ## Required Practices
 
 ### Input Validation
+
 All user input MUST be validated:
+
 ```typescript
 import { z } from 'zod';
 
@@ -41,6 +43,7 @@ const validated = userSchema.parse(req.body);
 ```
 
 ### Password Handling
+
 ```typescript
 // NEVER store plain text passwords
 import bcrypt from 'bcrypt';
@@ -52,6 +55,7 @@ const isValid = await bcrypt.compare(password, hash);
 ### Secret Detection Patterns
 
 Block commits/logs containing:
+
 - `password`, `secret`, `token`, `api_key`
 - Base64 strings > 40 characters
 - AWS/GCP credential patterns
@@ -60,6 +64,7 @@ Block commits/logs containing:
 ### Environment Variables
 
 Required `.env` entries (never commit actual values):
+
 ```
 DATABASE_URL=
 JWT_SECRET=
@@ -68,6 +73,7 @@ JWT_SECRET=
 ## Rate Limiting
 
 Apply rate limiting to sensitive endpoints:
+
 - Login: 5 attempts per 15 minutes
 - Register: 10 per hour per IP
 - API: 100 requests per minute per user

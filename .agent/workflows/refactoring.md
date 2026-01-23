@@ -17,6 +17,7 @@ When improving code structure without changing behavior.
 ### 1. Baseline Verification
 
 // turbo
+
 ```bash
 pnpm test
 pnpm typecheck
@@ -27,6 +28,7 @@ Confirm all tests pass BEFORE making any changes.
 ### 2. Define Scope
 
 Document exactly what will change:
+
 - Files affected
 - Functions/classes to modify
 - What behavior MUST be preserved
@@ -66,16 +68,19 @@ Apply refactoring with minimal diffs:
 ### 5. Verification
 
 // turbo
+
 ```bash
 pnpm test
 ```
 
 // turbo
+
 ```bash
 pnpm typecheck
 ```
 
 // turbo
+
 ```bash
 pnpm lint
 ```
@@ -87,11 +92,13 @@ All tests must still pass with identical behavior.
 Before committing, review the complete diff:
 
 // turbo
+
 ```bash
 git diff --stat
 ```
 
 Verify:
+
 - [ ] Only intended files changed
 - [ ] No accidental behavior changes
 - [ ] No new dependencies added

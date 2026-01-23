@@ -18,12 +18,15 @@ If a user request contradicts the content of `SPEC.md`, **stop and ask for clari
 ## 1. The Living Specification (`SPEC.md`)
 
 ### Purpose
+
 Contains the high-level design, architectural decisions, and approved feature plan.
 
 ### Rule
+
 Treat this file as the **absolute source of truth**. Before writing code, read this file to ensure alignment with the master plan.
 
 ### Maintenance
+
 If the user changes requirements during the chat, you **must update `SPEC.md`** to reflect the new consensus before implementing code. This prevents 'context loss' and ensures the spec remains a living executable artifact.
 
 ---
@@ -31,13 +34,17 @@ If the user changes requirements during the chat, you **must update `SPEC.md`** 
 ## 2. The Style Guide (`STYLE.md`)
 
 ### Purpose
+
 Documents the project's specific naming conventions, preferred libraries, and formatting rules.
 
 ### Rule
+
 Prioritize conventions in this file **over general language standards**. If this file provides examples, you must follow them strictly.
 
 ### Anti-Pattern Check
+
 Use this file to verify you are not introducing:
+
 - Inconsistent abstractions
 - Forbidden dependencies
 - Style violations
@@ -47,9 +54,11 @@ Use this file to verify you are not introducing:
 ## 3. The Agent Configuration (`AGENTS.md`)
 
 ### Purpose
+
 Defines how AI assistants should behave in this project.
 
 ### Rule
+
 - Follow any agent-specific instructions
 - Respect tool preferences
 - Apply project-specific patterns
@@ -59,9 +68,11 @@ Defines how AI assistants should behave in this project.
 ## 4. The Project Entry Point (`README.md`)
 
 ### Purpose
+
 Defines the project overview, build instructions, and component summary.
 
 ### Rule
+
 - **Greenfield**: When initializing a project, generate this file first
 - **Feature Development**: When adding new features or changing APIs, update this file to keep documentation synchronized with code
 
@@ -69,11 +80,11 @@ Defines the project overview, build instructions, and component summary.
 
 ## Quick Reference
 
-| File | Purpose | When to Update |
-|------|---------|----------------|
-| `SPEC.md` | Architecture & design decisions | When requirements change |
-| `STYLE.md` | Coding conventions & standards | When new patterns are adopted |
-| `AGENTS.md` | AI behavior configuration | When changing AI workflows |
+| File        | Purpose                               | When to Update                        |
+| ----------- | ------------------------------------- | ------------------------------------- |
+| `SPEC.md`   | Architecture & design decisions       | When requirements change              |
+| `STYLE.md`  | Coding conventions & standards        | When new patterns are adopted         |
+| `AGENTS.md` | AI behavior configuration             | When changing AI workflows            |
 | `README.md` | Project overview & build instructions | When adding features or changing APIs |
 
 ---

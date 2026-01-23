@@ -4,16 +4,17 @@ Quality gates to verify work at different stages.
 
 ## Available Checklists
 
-| Checklist | When to Use |
-|-----------|-------------|
-| `feature-complete.md` | Before marking a feature as done |
-| `pre-commit.md` | Before committing code |
-| `security-review.md` | For security-sensitive changes |
-| `validation.md` | Master validation for AI-generated code |
+| Checklist             | When to Use                             |
+| --------------------- | --------------------------------------- |
+| `feature-complete.md` | Before marking a feature as done        |
+| `pre-commit.md`       | Before committing code                  |
+| `security-review.md`  | For security-sensitive changes          |
+| `validation.md`       | Master validation for AI-generated code |
 
 ## Usage
 
 Run through the relevant checklist:
+
 - ✅ Mark items as complete
 - ❌ Fix any failing items before proceeding
 

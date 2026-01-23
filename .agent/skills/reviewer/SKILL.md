@@ -10,12 +10,14 @@ You are a thorough code reviewer ensuring quality, security, and maintainability
 ## Review Checklist
 
 ### 1. Correctness
+
 - [ ] Code does what it's supposed to do
 - [ ] Edge cases are handled
 - [ ] Error handling is appropriate
 - [ ] No obvious bugs
 
 ### 2. Code Quality
+
 - [ ] Follows project patterns
 - [ ] No code duplication
 - [ ] Functions are focused and small
@@ -23,12 +25,14 @@ You are a thorough code reviewer ensuring quality, security, and maintainability
 - [ ] No magic numbers/strings
 
 ### 3. TypeScript
+
 - [ ] No `any` types
 - [ ] Proper type definitions
 - [ ] Uses shared types from `@repo/types`
 - [ ] Strict mode compliant
 
 ### 4. Security
+
 - [ ] No sensitive data in code
 - [ ] Input validation present
 - [ ] SQL injection prevented (use Prisma)
@@ -36,6 +40,7 @@ You are a thorough code reviewer ensuring quality, security, and maintainability
 - [ ] Auth/authz checks present where needed
 
 ### 5. Performance
+
 - [ ] No N+1 queries
 - [ ] Appropriate caching
 - [ ] No memory leaks
@@ -49,29 +54,36 @@ You are a thorough code reviewer ensuring quality, security, and maintainability
 ### ✅ Approved / ⚠️ Changes Requested / ❌ Blocked
 
 ### Summary
+
 [Brief overview of what the code does]
 
 ### Strengths
+
 - [What's done well]
 
 ### Issues
 
 #### 🔴 Critical (must fix)
+
 - [Security issues, bugs, breaking changes]
 
 #### 🟡 Important (should fix)
+
 - [Quality issues, potential problems]
 
 #### 🟢 Suggestions (consider)
+
 - [Improvements, style preferences]
 
 ### Security Notes
+
 [Any security considerations]
 ```
 
 ## Common Issues to Flag
 
 ### Security
+
 ```typescript
 // 🔴 CRITICAL: Never log sensitive data
 console.log('User password:', password);
@@ -84,9 +96,10 @@ const { id } = userIdSchema.parse(req.params);
 ```
 
 ### Code Quality
+
 ```typescript
 // 🟡 IMPORTANT: Avoid nested ternaries
-const value = a ? b ? c : d : e;
+const value = a ? (b ? c : d) : e;
 
 // ✅ CORRECT
 if (a && b) return c;
@@ -95,12 +108,13 @@ return e;
 ```
 
 ### TypeScript
+
 ```typescript
 // 🟡 IMPORTANT: Don't use any
-function process(data: any) { }
+function process(data: any) {}
 
 // ✅ CORRECT
-function process(data: UserInput) { }
+function process(data: UserInput) {}
 ```
 
 ## Constraints

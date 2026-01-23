@@ -5,19 +5,23 @@ description: End-to-end workflow for implementing new features
 # Feature Development Workflow
 
 ## Prerequisites
+
 - Feature requirements are clear
 - No blocking dependencies
 
 ## Steps
 
 ### 1. Create Implementation Plan
+
 // turbo
+
 ```bash
 # Analyze existing patterns
 ls apps/backend/src apps/frontend/src packages/
 ```
 
 Create a plan covering:
+
 - Files to create/modify
 - Data models needed
 - API endpoints required
@@ -29,17 +33,20 @@ Create a plan covering:
 
 a. Update Prisma schema (if DB changes)
 // turbo
+
 ```bash
 pnpm --filter @repo/backend prisma format
 ```
 
 b. Generate Prisma client
 // turbo
+
 ```bash
 pnpm --filter @repo/backend prisma generate
 ```
 
 c. Create API endpoint:
+
 - Add route in `apps/backend/src/routes/`
 - Add controller in `apps/backend/src/controllers/`
 - Add Zod schema for validation
@@ -54,22 +61,27 @@ d. Add styles
 ### 4. Verification
 
 // turbo
+
 ```bash
 pnpm typecheck
 ```
 
 // turbo
+
 ```bash
 pnpm lint
 ```
 
 // turbo
+
 ```bash
 pnpm build
 ```
 
 ### 5. Test (if tests exist)
+
 // turbo
+
 ```bash
 pnpm test
 ```
@@ -77,6 +89,7 @@ pnpm test
 ### 6. Git Commit
 
 Follow conventional commit format:
+
 ```
 feat(<scope>): <description>
 ```

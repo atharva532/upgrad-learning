@@ -8,6 +8,7 @@ description: Component patterns, hooks, state management, and accessibility for 
 ## Component Guidelines
 
 ### DO
+
 - Use functional components with hooks
 - Keep components small and focused
 - Use TypeScript interfaces for props
@@ -16,6 +17,7 @@ description: Component patterns, hooks, state management, and accessibility for 
 - Use `useMemo` for expensive computations
 
 ### DON'T
+
 - Use class components
 - Put business logic in components (use hooks/services)
 - Use inline styles for complex styling
@@ -63,9 +65,11 @@ export function UserCard({ user, onSelect }: UserCardProps) {
 function useUser(id: string) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
-    fetchUser(id).then(setUser).finally(() => setLoading(false));
+    fetchUser(id)
+      .then(setUser)
+      .finally(() => setLoading(false));
   }, [id]);
 
   return { user, loading };
@@ -141,4 +145,3 @@ function useUser(id: string) {
 - **DO NOT** use color alone to convey meaning
 - **ALWAYS** provide text alternatives for images
 - **ALWAYS** test with keyboard navigation
-

@@ -30,11 +30,7 @@ export class AppError extends Error {
 // Specific error types
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string) {
-    super(
-      id ? `${resource} with id '${id}' not found` : `${resource} not found`,
-      404,
-      'NOT_FOUND'
-    );
+    super(id ? `${resource} with id '${id}' not found` : `${resource} not found`, 404, 'NOT_FOUND');
   }
 }
 
@@ -138,12 +134,7 @@ throw { code: 'error', type: 'NOT_FOUND', kind: '404' };
 
 ```typescript
 // Global error handler
-export function errorHandler(
-  error: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export function errorHandler(error: Error, req: Request, res: Response, next: NextFunction) {
   // Log all errors
   logger.error('Request failed', {
     error: error.message,
@@ -211,12 +202,12 @@ function UserProfile({ userId }: { userId: string }) {
 
 ## Error Logging Levels
 
-| Level | When to Use |
-|-------|-------------|
+| Level   | When to Use                              |
+| ------- | ---------------------------------------- |
 | `error` | Unexpected failures, exceptions, crashes |
-| `warn` | Expected issues (validation, not found) |
-| `info` | Important events (login, payment) |
-| `debug` | Development debugging |
+| `warn`  | Expected issues (validation, not found)  |
+| `info`  | Important events (login, payment)        |
+| `debug` | Development debugging                    |
 
 ---
 

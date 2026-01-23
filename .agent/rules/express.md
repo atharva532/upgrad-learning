@@ -19,6 +19,7 @@ apps/backend/src/
 ## Endpoint Guidelines
 
 ### DO
+
 - Use REST conventions (GET, POST, PUT, DELETE)
 - Validate all input with Zod schemas
 - Use consistent response format
@@ -26,6 +27,7 @@ apps/backend/src/
 - Use typed request/response
 
 ### DON'T
+
 - Put business logic in controllers
 - Return raw Prisma errors to client
 - Log sensitive data
@@ -34,6 +36,7 @@ apps/backend/src/
 ## Code Patterns
 
 ### Route Definition
+
 ```typescript
 import { Router } from 'express';
 import { validate } from '../middlewares/validate';
@@ -49,6 +52,7 @@ export const userRoutes: Router = router;
 ```
 
 ### Controller
+
 ```typescript
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/user.service';
@@ -66,6 +70,7 @@ export class UserController {
 ```
 
 ### Response Format
+
 ```typescript
 // Success
 { success: true, data: { ... } }
@@ -74,10 +79,10 @@ export class UserController {
 { success: false, error: "Error message" }
 
 // Paginated
-{ 
-  success: true, 
-  data: [...], 
-  pagination: { page: 1, limit: 10, total: 100 } 
+{
+  success: true,
+  data: [...],
+  pagination: { page: 1, limit: 10, total: 100 }
 }
 ```
 
@@ -110,22 +115,20 @@ import pino from 'pino';
 
 export const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
-  transport: process.env.NODE_ENV === 'development' 
-    ? { target: 'pino-pretty' } 
-    : undefined,
+  transport: process.env.NODE_ENV === 'development' ? { target: 'pino-pretty' } : undefined,
 });
 ```
 
 ### Log Levels
 
-| Level | When to Use |
-|-------|-------------|
-| `fatal` | Application crash, unrecoverable |
-| `error` | Errors that need attention |
-| `warn` | Potential issues, deprecations |
-| `info` | Important events (startup, requests) |
-| `debug` | Detailed debugging info |
-| `trace` | Very detailed tracing |
+| Level   | When to Use                          |
+| ------- | ------------------------------------ |
+| `fatal` | Application crash, unrecoverable     |
+| `error` | Errors that need attention           |
+| `warn`  | Potential issues, deprecations       |
+| `info`  | Important events (startup, requests) |
+| `debug` | Detailed debugging info              |
+| `trace` | Very detailed tracing                |
 
 ### Request Logging
 
@@ -133,16 +136,19 @@ export const logger = pino({
 // Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
-  
+
   res.on('finish', () => {
-    logger.info({
-      method: req.method,
-      path: req.path,
-      statusCode: res.statusCode,
-      duration: Date.now() - start,
-    }, 'Request completed');
+    logger.info(
+      {
+        method: req.method,
+        path: req.path,
+        statusCode: res.statusCode,
+        duration: Date.now() - start,
+      },
+      'Request completed'
+    );
   });
-  
+
   next();
 });
 ```
@@ -160,18 +166,18 @@ logger.error({ err: error, userId }, 'Failed to process payment');
 logger.info('User ' + userId + ' logged in');
 
 // ❌ Never log sensitive data
-logger.info({ password });  // NEVER!
+logger.info({ password }); // NEVER!
 ```
 
 ### What to Log
 
-| Log | Don't Log |
-|-----|-----------|
+| Log                          | Don't Log                                 |
+| ---------------------------- | ----------------------------------------- |
 | Request method, path, status | Request/response bodies (may contain PII) |
-| Response times | Passwords, tokens, secrets |
-| Error messages and stacks | Credit card numbers |
-| User IDs (for tracing) | Personal identifying information |
-| Business events | Sensitive query parameters |
+| Response times               | Passwords, tokens, secrets                |
+| Error messages and stacks    | Credit card numbers                       |
+| User IDs (for tracing)       | Personal identifying information          |
+| Business events              | Sensitive query parameters                |
 
 ---
 

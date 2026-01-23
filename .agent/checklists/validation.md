@@ -10,11 +10,13 @@ This checklist catches defects and vulnerabilities commonly found in AI-generate
 ## Code Quality
 
 ### 1. Specification Compliance
+
 - [ ] Does the code implement exactly what was requested?
 - [ ] Are all acceptance criteria met?
 - [ ] Does it match the agreed architecture in SPEC.md?
 
 ### 2. Architecture Fit
+
 - [ ] Is the code in the correct package/layer?
 - [ ] Is business logic kept in services, NOT in controllers?
 - [ ] Are dependencies flowing in the correct direction?
@@ -33,6 +35,7 @@ This checklist catches defects and vulnerabilities commonly found in AI-generate
 ```
 
 ### 3. Duplication Check
+
 - [ ] Does an existing utility already solve this?
 - [ ] Have you checked `packages/shared` for reusable code?
 - [ ] Are you NOT duplicating code?
@@ -42,6 +45,7 @@ This checklist catches defects and vulnerabilities commonly found in AI-generate
 ## AI-Specific Checks
 
 ### 4. Import Integrity (Hallucination Check)
+
 - [ ] Are **ALL imports real**?
 - [ ] Are package names spelled correctly?
 - [ ] Is the imported module actually exported from the source?
@@ -52,10 +56,11 @@ This checklist catches defects and vulnerabilities commonly found in AI-generate
 import { someFunction } from 'non-existent-package';
 
 // ✅ VERIFY: Check that the export exists
-import { UserDTO } from '@repo/shared';  // Exists in packages/shared?
+import { UserDTO } from '@repo/shared'; // Exists in packages/shared?
 ```
 
 ### 5. API Consistency
+
 - [ ] Do function signatures match existing patterns?
 - [ ] Are error types consistent with the codebase?
 - [ ] Are return types explicit (no implicit `any`)?
@@ -65,6 +70,7 @@ import { UserDTO } from '@repo/shared';  // Exists in packages/shared?
 ## Naming & Style
 
 ### 6. Conventions
+
 - [ ] Do class/component names follow PascalCase?
 - [ ] Do variables/functions follow camelCase?
 - [ ] Are files named consistently with the project?
@@ -75,6 +81,7 @@ import { UserDTO } from '@repo/shared';  // Exists in packages/shared?
 ## Error Handling
 
 ### 7. Exception Management
+
 - [ ] Are specific, meaningful errors used (not generic `Error`)?
 - [ ] Are low-level errors wrapped with context?
 - [ ] Are errors logged before being rethrown?
@@ -92,6 +99,7 @@ throw new Error('Something went wrong');
 ## Security
 
 ### 8. Security Sanity
+
 - [ ] **Injection**: Are all queries parameterized (Prisma handles this)?
 - [ ] **XSS**: Is output properly encoded/escaped?
 - [ ] **Secrets**: Are there ZERO hard-coded credentials?
@@ -102,6 +110,7 @@ throw new Error('Something went wrong');
 ## Observability
 
 ### 9. Logging & Monitoring
+
 - [ ] Are structured logs added for critical paths?
 - [ ] Are errors logged with stack traces?
 - [ ] Can the operation be traced end-to-end?
@@ -111,11 +120,13 @@ throw new Error('Something went wrong');
 ## Verification
 
 ### 10. Tests
+
 - [ ] Do tests exist for the new functionality?
 - [ ] Are edge cases covered?
 - [ ] Do all tests pass? (`pnpm test`)
 
 ### 11. Build & Lint
+
 - [ ] `pnpm typecheck` passes?
 - [ ] `pnpm lint` passes?
 - [ ] `pnpm build` succeeds?
@@ -125,6 +136,7 @@ throw new Error('Something went wrong');
 ## Documentation
 
 ### 12. Code Documentation
+
 - [ ] Are complex functions documented with JSDoc?
 - [ ] Are non-obvious decisions explained in comments?
 - [ ] Is README updated if adding new features?

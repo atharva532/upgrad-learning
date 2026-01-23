@@ -9,18 +9,18 @@ This directory contains specialized AI personas (skills) for different developme
 
 ## Available Skills
 
-| Skill | File | Role |
-|-------|------|------|
-| **System Architect** | [architect/](architect/SKILL.md) | Designs architecture, makes technical decisions |
-| **Code Implementer** | [implementer/](implementer/SKILL.md) | Implements features following patterns |
-| **Code Reviewer** | [reviewer/](reviewer/SKILL.md) | Reviews code for quality and security |
-| **Debugger** | [debugger/](debugger/SKILL.md) | Diagnoses and fixes bugs |
-| **Test Writer** | [tester/](tester/SKILL.md) | Writes comprehensive tests |
-| **Git Commit** | [git-commit/](git-commit/SKILL.md) | Creates semantic commit messages |
-| **Security Analyst** | [security/](security/SKILL.md) | Identifies vulnerabilities |
-| **Fullstack Monorepo** | [fullstack-monorepo/](fullstack-monorepo/SKILL.md) | Manages monorepo structure |
-| **Code Explainer** | [explainer/](explainer/SKILL.md) | Explains code for different audiences |
-| **Researcher** | [researcher/](researcher/SKILL.md) | Researches technical topics |
+| Skill                  | File                                               | Role                                            |
+| ---------------------- | -------------------------------------------------- | ----------------------------------------------- |
+| **System Architect**   | [architect/](architect/SKILL.md)                   | Designs architecture, makes technical decisions |
+| **Code Implementer**   | [implementer/](implementer/SKILL.md)               | Implements features following patterns          |
+| **Code Reviewer**      | [reviewer/](reviewer/SKILL.md)                     | Reviews code for quality and security           |
+| **Debugger**           | [debugger/](debugger/SKILL.md)                     | Diagnoses and fixes bugs                        |
+| **Test Writer**        | [tester/](tester/SKILL.md)                         | Writes comprehensive tests                      |
+| **Git Commit**         | [git-commit/](git-commit/SKILL.md)                 | Creates semantic commit messages                |
+| **Security Analyst**   | [security/](security/SKILL.md)                     | Identifies vulnerabilities                      |
+| **Fullstack Monorepo** | [fullstack-monorepo/](fullstack-monorepo/SKILL.md) | Manages monorepo structure                      |
+| **Code Explainer**     | [explainer/](explainer/SKILL.md)                   | Explains code for different audiences           |
+| **Researcher**         | [researcher/](researcher/SKILL.md)                 | Researches technical topics                     |
 
 ---
 
@@ -52,15 +52,15 @@ description: What this skill does
 
 ## When to Use Each Skill
 
-| Task | Primary Skill | Supporting Skills |
-|------|---------------|-------------------|
-| **Planning** | Architect | Researcher |
-| **Coding** | Implementer | Fullstack Monorepo |
-| **Reviewing** | Reviewer | Security Analyst |
-| **Testing** | Tester | Debugger |
-| **Fixing Bugs** | Debugger | Tester |
-| **Committing** | Git Commit | - |
-| **Explaining** | Explainer | - |
+| Task            | Primary Skill | Supporting Skills  |
+| --------------- | ------------- | ------------------ |
+| **Planning**    | Architect     | Researcher         |
+| **Coding**      | Implementer   | Fullstack Monorepo |
+| **Reviewing**   | Reviewer      | Security Analyst   |
+| **Testing**     | Tester        | Debugger           |
+| **Fixing Bugs** | Debugger      | Tester             |
+| **Committing**  | Git Commit    | -                  |
+| **Explaining**  | Explainer     | -                  |
 
 ---
 

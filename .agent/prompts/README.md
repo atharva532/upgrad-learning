@@ -4,12 +4,12 @@ This directory contains reusable prompt patterns for common development tasks.
 
 ## Available Patterns
 
-| Pattern | File | Purpose |
-|---------|------|---------|
+| Pattern           | File                   | Purpose                         |
+| ----------------- | ---------------------- | ------------------------------- |
 | Implement Feature | `implement-feature.md` | Feature implementation template |
-| Fix Bug | `fix-bug.md` | Bug fixing workflow |
-| Review Code | `review-code.md` | Structured code review |
-| Write Tests | `write-tests.md` | Test generation template |
+| Fix Bug           | `fix-bug.md`           | Bug fixing workflow             |
+| Review Code       | `review-code.md`       | Structured code review          |
+| Write Tests       | `write-tests.md`       | Test generation template        |
 
 ---
 
@@ -24,13 +24,13 @@ This directory contains reusable prompt patterns for common development tasks.
 
 ### ❌ DON'T (Anti-Patterns)
 
-| Anti-Pattern | Problem | Solution |
-|--------------|---------|----------|
+| Anti-Pattern           | Problem                                                 | Solution                                          |
+| ---------------------- | ------------------------------------------------------- | ------------------------------------------------- |
 | **Open-Ended Wording** | "What's the best way to do X?" leads to vague responses | Use structured patterns with clear inputs/outputs |
-| **Prompt Thrashing** | Asking the same thing repeatedly | If it fails twice, stop and refine the context |
-| **Blind Trust** | Accepting fixes without verification | Always verify with regression tests |
-| **Context Overload** | Dumping entire codebase | Provide only relevant files and context |
-| **Vague Scope** | "Make the code better" | Specify exactly what to improve and why |
+| **Prompt Thrashing**   | Asking the same thing repeatedly                        | If it fails twice, stop and refine the context    |
+| **Blind Trust**        | Accepting fixes without verification                    | Always verify with regression tests               |
+| **Context Overload**   | Dumping entire codebase                                 | Provide only relevant files and context           |
+| **Vague Scope**        | "Make the code better"                                  | Specify exactly what to improve and why           |
 
 ---
 

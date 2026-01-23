@@ -80,7 +80,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   JWT_SECRET: z.string().min(32),
-  NEW_VARIABLE: z.string().optional(),  // Add here
+  NEW_VARIABLE: z.string().optional(), // Add here
 });
 
 export const env = envSchema.parse(process.env);
@@ -123,7 +123,8 @@ const timeout = env.TIMEOUT ?? 5000;
 
 ```typescript
 // ❌ Access process.env directly throughout codebase
-if (process.env.NODE_ENV === 'development') { }
+if (process.env.NODE_ENV === 'development') {
+}
 
 // ❌ Hardcode values that should be configurable
 const apiUrl = 'http://localhost:3001';
@@ -132,7 +133,7 @@ const apiUrl = 'http://localhost:3001';
 const JWT_SECRET = 'my-super-secret-key';
 
 // ❌ Skip validation
-const port = parseInt(process.env.PORT);  // Could be NaN!
+const port = parseInt(process.env.PORT); // Could be NaN!
 ```
 
 ---
@@ -159,11 +160,13 @@ fetch(`${config.apiUrl}/users`);
 ## Secrets Management
 
 ### Development
+
 - Use `.env` files (git-ignored)
 - Never commit actual secrets
 - Share secrets via secure channels (1Password, etc.)
 
 ### Production
+
 - Use environment variables from hosting platform
 - Or use secret managers (AWS Secrets Manager, Vault)
 - Rotate secrets regularly
@@ -190,7 +193,7 @@ try {
 ## Constraints
 
 - **DO NOT** commit `.env` files to version control
-- **DO NOT** put secrets in frontend code (VITE_ prefix)
+- **DO NOT** put secrets in frontend code (VITE\_ prefix)
 - **DO NOT** use `process.env` directly - use config module
 - **ALWAYS** update `.env.example` when adding new variables
 - **ALWAYS** validate environment variables with zod

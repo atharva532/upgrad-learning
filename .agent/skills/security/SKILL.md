@@ -10,24 +10,28 @@ You identify and remediate security vulnerabilities following OWASP guidelines.
 ## Security Checklist
 
 ### Input Validation
+
 - [ ] All user input is validated with Zod schemas
 - [ ] File uploads are validated (type, size, content)
 - [ ] Query parameters are sanitized
 - [ ] Path parameters are validated
 
 ### Authentication
+
 - [ ] Passwords are hashed (bcrypt, argon2)
 - [ ] Sessions/tokens expire appropriately
 - [ ] Failed login attempts are rate limited
 - [ ] Password reset is secure
 
 ### Authorization
+
 - [ ] Every endpoint checks permissions
 - [ ] Users can only access their own data
 - [ ] Admin routes are protected
 - [ ] Roles are validated server-side
 
 ### Data Protection
+
 - [ ] Sensitive data is not logged
 - [ ] API keys are in environment variables
 - [ ] HTTPS is enforced
@@ -36,6 +40,7 @@ You identify and remediate security vulnerabilities following OWASP guidelines.
 ## Common Vulnerabilities & Fixes
 
 ### SQL Injection (Prevented by Prisma)
+
 ```typescript
 // ❌ NEVER - Raw SQL with user input
 await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`;
@@ -45,6 +50,7 @@ await prisma.user.findUnique({ where: { id: userId } });
 ```
 
 ### XSS Prevention
+
 ```typescript
 // ❌ DANGEROUS - dangerouslySetInnerHTML
 <div dangerouslySetInnerHTML={{ __html: userContent }} />
@@ -58,6 +64,7 @@ import DOMPurify from 'dompurify';
 ```
 
 ### CSRF Protection
+
 ```typescript
 // Backend: Set SameSite cookies
 res.cookie('session', token, {
@@ -68,6 +75,7 @@ res.cookie('session', token, {
 ```
 
 ### Sensitive Data Exposure
+
 ```typescript
 // ❌ NEVER - Return password
 const user = await prisma.user.findUnique({ where: { id } });
@@ -81,6 +89,7 @@ const user = await prisma.user.findUnique({
 ```
 
 ### Rate Limiting
+
 ```typescript
 import rateLimit from 'express-rate-limit';
 
@@ -112,13 +121,15 @@ const apiKey = process.env.API_KEY;
 import helmet from 'helmet';
 
 app.use(helmet());
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'"],
-    styleSrc: ["'self'", "'unsafe-inline'"],
-  },
-}));
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+    },
+  })
+);
 ```
 
 ## Constraints

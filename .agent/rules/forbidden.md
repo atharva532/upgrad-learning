@@ -10,12 +10,14 @@ Actions the agent must NEVER perform without explicit user approval.
 ## File Operations
 
 ### Never Modify
+
 - `.env` files (contains secrets)
 - `pnpm-lock.yaml` (modify through pnpm commands only)
 - `.git/` directory
 - `node_modules/` directory
 
 ### Never Delete Without Approval
+
 - `package.json` files
 - Prisma schema files
 - Configuration files (tsconfig, vite.config, etc.)
@@ -24,6 +26,7 @@ Actions the agent must NEVER perform without explicit user approval.
 ## Code Operations
 
 ### Never Do
+
 - Use `any` type
 - Use `// @ts-ignore`
 - Disable ESLint rules inline
@@ -31,6 +34,7 @@ Actions the agent must NEVER perform without explicit user approval.
 - Push to remote without approval
 
 ### Always Require Approval For
+
 - Database migrations
 - Deleting files
 - Installing new dependencies
@@ -40,6 +44,7 @@ Actions the agent must NEVER perform without explicit user approval.
 ## Terminal Commands
 
 ### Auto-Approve (Safe)
+
 - `pnpm install`
 - `pnpm build`
 - `pnpm dev`
@@ -49,6 +54,7 @@ Actions the agent must NEVER perform without explicit user approval.
 - `cat`, `ls`, `head`, `tail`
 
 ### Require Approval
+
 - `pnpm prisma migrate *`
 - `pnpm prisma db push`
 - `rm`, `rmdir`
@@ -56,6 +62,7 @@ Actions the agent must NEVER perform without explicit user approval.
 - `npm publish`
 
 ### Never Execute
+
 - `sudo *`
 - `curl` / `wget` to external URLs
 - `ssh`

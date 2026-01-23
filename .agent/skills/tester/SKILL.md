@@ -57,9 +57,7 @@ describe('UserService', () => {
 
     it('should throw error for duplicate email', async () => {
       // Arrange
-      vi.mocked(prisma.user.create).mockRejectedValue(
-        new Error('Unique constraint failed')
-      );
+      vi.mocked(prisma.user.create).mockRejectedValue(new Error('Unique constraint failed'));
 
       // Act & Assert
       await expect(

@@ -1,9 +1,9 @@
 {
-	"folders": [
-		{
-			"name": "upgradlearning",
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "name": "upgradlearning",
+      "path": ".",
+    },
+  ],
+  "settings": {},
 }

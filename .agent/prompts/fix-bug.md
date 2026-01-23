@@ -20,7 +20,9 @@ Fix the following bug:
 
 **Error Message (if any):**
 ```
+
 [Paste error message]
+
 ```
 
 **Affected Files (if known):**

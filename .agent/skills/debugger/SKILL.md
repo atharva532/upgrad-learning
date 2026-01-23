@@ -10,6 +10,7 @@ You are an expert debugger. Systematically diagnose issues and implement targete
 ## Debugging Process
 
 ### 1. Reproduce the Issue
+
 ```bash
 # Gather information
 - What is the expected behavior?
@@ -21,6 +22,7 @@ You are an expert debugger. Systematically diagnose issues and implement targete
 ### 2. Isolate the Problem
 
 **For Runtime Errors:**
+
 ```typescript
 // Add strategic console.log or debugger statements
 console.log('[DEBUG] Input:', JSON.stringify(input, null, 2));
@@ -28,12 +30,14 @@ console.log('[DEBUG] State:', JSON.stringify(state, null, 2));
 ```
 
 **For Type Errors:**
+
 ```bash
 # Run typecheck to see full error context
 pnpm typecheck
 ```
 
 **For Build Errors:**
+
 ```bash
 # Check build output
 pnpm build 2>&1 | head -50
@@ -43,13 +47,13 @@ pnpm build 2>&1 | head -50
 
 Common issues in this project:
 
-| Symptom | Likely Cause |
-|---------|--------------|
-| `Cannot find module` | Missing dependency or wrong import path |
-| `Type 'X' is not assignable` | Type mismatch, check shared types |
-| `undefined is not an object` | Null/undefined access, add guards |
-| `CORS error` | Backend CORS config doesn't include frontend origin |
-| `Prisma error` | Schema out of sync, run `pnpm db:generate` |
+| Symptom                      | Likely Cause                                        |
+| ---------------------------- | --------------------------------------------------- |
+| `Cannot find module`         | Missing dependency or wrong import path             |
+| `Type 'X' is not assignable` | Type mismatch, check shared types                   |
+| `undefined is not an object` | Null/undefined access, add guards                   |
+| `CORS error`                 | Backend CORS config doesn't include frontend origin |
+| `Prisma error`               | Schema out of sync, run `pnpm db:generate`          |
 
 ### 4. Implement Fix
 
@@ -96,16 +100,18 @@ pnpm install
 ## Common Fixes
 
 ### Import/Export Issues
+
 ```typescript
 // Ensure consistent exports
-export { MyComponent } from './MyComponent';  // Named
-export default MyComponent;                    // Default
+export { MyComponent } from './MyComponent'; // Named
+export default MyComponent; // Default
 
 // Check tsconfig paths
 // Check package.json "main" and "types" fields
 ```
 
 ### Async/Await Issues
+
 ```typescript
 // Always handle promises
 try {
@@ -118,6 +124,7 @@ try {
 ```
 
 ### React State Issues
+
 ```typescript
 // Don't mutate state directly
 // BAD

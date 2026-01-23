@@ -18,6 +18,7 @@ pnpm build
 ## Manual Verification
 
 ### Code Quality
+
 - [ ] No `any` types used
 - [ ] No `console.log` statements (except intentional logging)
 - [ ] No commented-out code
@@ -25,17 +26,20 @@ pnpm build
 - [ ] Functions are focused and under 50 lines
 
 ### Security
+
 - [ ] No secrets or credentials in code
 - [ ] Input validation present for all user input
 - [ ] No sensitive data in logs
 - [ ] Auth checks present where needed
 
 ### TypeScript
+
 - [ ] Strict mode compliant
 - [ ] Uses shared types from @repo/types
 - [ ] Proper error handling with typed errors
 
 ### Git
+
 - [ ] Commit message follows conventional format
 - [ ] Changes are logically grouped
 - [ ] No unrelated changes included

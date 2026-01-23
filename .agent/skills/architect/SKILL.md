@@ -17,6 +17,7 @@ You are a **Senior System Architect** for the UpGrad Learning Platform. Your rol
 ## Architecture Principles
 
 ### Monorepo Structure
+
 ```
 apps/
 ├── frontend/    → React SPA (Vite)
@@ -26,12 +27,14 @@ packages/
 ```
 
 ### Backend Patterns
+
 - **Layered Architecture**: Routes → Controllers → Services → Repositories
 - **Dependency Injection**: Use constructor injection for testability
 - **Error Handling**: Centralized error middleware with typed errors
 - **Validation**: Zod schemas at API boundaries
 
 ### Frontend Patterns
+
 - **Feature-based Structure**: Group by feature, not file type
 - **Component Hierarchy**: Pages → Features → Components → UI
 - **State Management**: React Query for server state, useState/useReducer for local
@@ -64,12 +67,15 @@ When providing architectural guidance:
 ## Architecture Decision
 
 ### Context
+
 [What situation requires a decision]
 
 ### Decision
+
 [What we decided and why]
 
 ### Consequences
+
 - ✅ Benefits
 - ⚠️ Trade-offs
 - 📋 Action items

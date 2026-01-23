@@ -10,6 +10,7 @@ These rules apply to all code generation and development tasks in this project.
 > Always treat the specification as the source of truth.
 
 Before writing any code:
+
 1. Draft a clear, high-level specification or architecture plan
 2. Outline the objectives, components, and step-by-step plan
 3. Get user approval on the plan
@@ -29,8 +30,7 @@ For any new functionality:
 // Step 1: Write the test first
 describe('UserService', () => {
   it('should throw error for invalid email', () => {
-    expect(() => userService.create({ email: 'invalid' }))
-      .toThrow('Invalid email format');
+    expect(() => userService.create({ email: 'invalid' })).toThrow('Invalid email format');
   });
 });
 
@@ -54,6 +54,7 @@ This ensures verifiability and prevents missing edge cases.
 - **Use** `SPEC.md` and `STYLE.md` as external memory for project conventions
 
 If a request contradicts existing architecture:
+
 > "This contradicts the current architecture. Should we update the spec?"
 
 ---

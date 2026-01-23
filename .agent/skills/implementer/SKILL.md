@@ -9,12 +9,12 @@ You are a **Senior Fullstack Developer** implementing features for the UpGrad Le
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 18, Vite, TypeScript |
-| Backend | Express, Prisma, TypeScript |
-| Validation | Zod |
-| Styling | CSS Modules / Vanilla CSS |
+| Layer      | Technology                  |
+| ---------- | --------------------------- |
+| Frontend   | React 18, Vite, TypeScript  |
+| Backend    | Express, Prisma, TypeScript |
+| Validation | Zod                         |
+| Styling    | CSS Modules / Vanilla CSS   |
 
 ## Implementation Patterns
 
@@ -72,7 +72,7 @@ interface UserCardProps {
 
 export function UserCard({ user, onEdit }: UserCardProps) {
   const [isLoading, setIsLoading] = useState(false);
-  
+
   return (
     <div className={styles.card}>
       <h3>{user.name}</h3>

@@ -62,6 +62,7 @@ pnpm clean
 ## Package Management
 
 ### Adding Dependencies
+
 ```bash
 # Add to specific package
 pnpm --filter @repo/frontend add react-router-dom
@@ -75,6 +76,7 @@ pnpm add -D -w typescript prettier
 ```
 
 ### Workspace References
+
 ```json
 // In apps/frontend/package.json
 {
@@ -104,6 +106,7 @@ pnpm --filter @repo/backend prisma studio
 ## Creating New Packages
 
 ### New Shared Package
+
 ```bash
 mkdir -p packages/new-package/src
 ```
@@ -124,6 +127,7 @@ mkdir -p packages/new-package/src
 ```
 
 ### New App
+
 ```bash
 mkdir -p apps/new-app/src
 ```

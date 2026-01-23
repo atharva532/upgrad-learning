@@ -19,34 +19,35 @@ Create clear, semantic commit messages following Conventional Commits specificat
 
 ## Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `feat` | New feature | `feat(auth): add login endpoint` |
-| `fix` | Bug fix | `fix(api): handle null user response` |
-| `docs` | Documentation | `docs(readme): update setup instructions` |
-| `style` | Formatting (no code change) | `style(lint): fix indentation` |
+| Type       | Description                  | Example                                    |
+| ---------- | ---------------------------- | ------------------------------------------ |
+| `feat`     | New feature                  | `feat(auth): add login endpoint`           |
+| `fix`      | Bug fix                      | `fix(api): handle null user response`      |
+| `docs`     | Documentation                | `docs(readme): update setup instructions`  |
+| `style`    | Formatting (no code change)  | `style(lint): fix indentation`             |
 | `refactor` | Code change (no feature/fix) | `refactor(user): extract validation logic` |
-| `perf` | Performance improvement | `perf(query): add database index` |
-| `test` | Adding tests | `test(auth): add login unit tests` |
-| `chore` | Build/tooling | `chore(deps): update typescript to 5.3` |
-| `ci` | CI/CD changes | `ci(github): add deploy workflow` |
+| `perf`     | Performance improvement      | `perf(query): add database index`          |
+| `test`     | Adding tests                 | `test(auth): add login unit tests`         |
+| `chore`    | Build/tooling                | `chore(deps): update typescript to 5.3`    |
+| `ci`       | CI/CD changes                | `ci(github): add deploy workflow`          |
 
 ## Scopes
 
-| Scope | Description |
-|-------|-------------|
+| Scope      | Description          |
+| ---------- | -------------------- |
 | `frontend` | Frontend app changes |
-| `backend` | Backend app changes |
-| `api` | API endpoints |
-| `auth` | Authentication |
-| `db` | Database/Prisma |
-| `ui` | UI components |
-| `types` | Shared types package |
-| `deps` | Dependencies |
+| `backend`  | Backend app changes  |
+| `api`      | API endpoints        |
+| `auth`     | Authentication       |
+| `db`       | Database/Prisma      |
+| `ui`       | UI components        |
+| `types`    | Shared types package |
+| `deps`     | Dependencies         |
 
 ## Examples
 
 ### Feature
+
 ```
 feat(backend): add user registration endpoint
 
@@ -59,6 +60,7 @@ Closes #123
 ```
 
 ### Bug Fix
+
 ```
 fix(frontend): prevent form double submission
 
@@ -74,6 +76,7 @@ Fixes #456
 ```
 
 ### Breaking Change
+
 ```
 feat(api)!: rename user endpoint to users
 
@@ -84,6 +87,7 @@ Migration: Update all client code to use /api/users
 ```
 
 ### Multiple Files
+
 ```
 refactor(types): consolidate user types
 

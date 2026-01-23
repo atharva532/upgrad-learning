@@ -5,6 +5,7 @@ description: Systematic workflow for diagnosing and fixing bugs
 # Bug Fix Workflow
 
 ## Prerequisites
+
 - Bug is reported with reproduction steps
 - Expected vs actual behavior is clear
 
@@ -13,6 +14,7 @@ description: Systematic workflow for diagnosing and fixing bugs
 ### 1. Reproduce the Issue
 
 // turbo
+
 ```bash
 pnpm dev
 ```
@@ -23,11 +25,13 @@ Verify you can reproduce the bug following the reported steps.
 
 Check for errors:
 // turbo
+
 ```bash
 pnpm typecheck
 ```
 
 // turbo
+
 ```bash
 pnpm lint
 ```
@@ -43,16 +47,19 @@ Analyze relevant files based on the bug location.
 ### 4. Verify the Fix
 
 // turbo
+
 ```bash
 pnpm typecheck
 ```
 
 // turbo
+
 ```bash
 pnpm lint
 ```
 
 // turbo
+
 ```bash
 pnpm build
 ```
@@ -63,6 +70,7 @@ Manually verify the bug is fixed and no regressions introduced.
 
 If tests exist:
 // turbo
+
 ```bash
 pnpm test
 ```
