@@ -1,16 +1,29 @@
 import 'dotenv/config';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Read version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+const APP_VERSION = packageJson.version;
 
 const app: Application = express();
 
-// Middleware
+// Security middleware
+app.use(helmet());
+
+// CORS middleware
 app.use(
   cors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? ['https://yourdomain.com']
-        : ['http://localhost:5173', 'http://localhost:3000'],
+        ? [process.env.FRONTEND_URL || 'https://yourdomain.com']
+        : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
     credentials: true,
   })
 );
@@ -33,7 +46,7 @@ app.get('/', (_req: Request, res: Response) => {
   res.json({
     success: true,
     message: 'UpGrad Learning API',
-    version: '0.1.0',
+    version: APP_VERSION,
     docs: '/api/health',
     timestamp: new Date().toISOString(),
   });

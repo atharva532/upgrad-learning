@@ -42,10 +42,13 @@ You identify and remediate security vulnerabilities following OWASP guidelines.
 ### SQL Injection (Prevented by Prisma)
 
 ```typescript
-// ❌ NEVER - Raw SQL with user input
+// ❌ NEVER - Unsafe raw SQL with string concatenation
+await prisma.$queryRawUnsafe(`SELECT * FROM users WHERE id = '${userId}'`);
+
+// ✅ SAFE - Tagged template literal (parameterized, but prefer ORM)
 await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`;
 
-// ✅ CORRECT - Prisma ORM
+// ✅ RECOMMENDED - Prisma ORM (fully type-safe)
 await prisma.user.findUnique({ where: { id: userId } });
 ```
 

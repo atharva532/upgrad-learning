@@ -9,7 +9,7 @@ You manage a production-grade fullstack monorepo with shared packages.
 
 ## Project Structure
 
-```
+```text
 upgradlearning/
 ├── apps/
 │   ├── frontend/         # React + Vite
@@ -142,7 +142,7 @@ mkdir -p apps/new-app/src
 
 ## Dependency Rules
 
-```
+```text
 apps/frontend  →  packages/*  ✅
 apps/backend   →  packages/*  ✅
 packages/a     →  packages/b  ✅ (if no cycle)

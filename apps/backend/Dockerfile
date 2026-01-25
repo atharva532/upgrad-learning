@@ -50,7 +50,7 @@ WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=3000
 
 # Copy package.json, pnpm files, and prisma schema for production
 COPY --from=builder /app/apps/backend/package.json ./
@@ -68,11 +68,11 @@ COPY --from=builder /app/apps/backend/dist ./dist
 USER expressjs
 
 # Expose the port
-EXPOSE 3001
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
 # Start the application
 CMD ["node", "dist/server.js"]

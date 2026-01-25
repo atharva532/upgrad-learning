@@ -4,7 +4,7 @@ Use this prompt template when asking the agent to implement a new feature.
 
 ## Template
 
-```
+```text
 Implement [FEATURE_NAME] with the following requirements:
 
 **Description:**
@@ -27,7 +27,7 @@ Implement [FEATURE_NAME] with the following requirements:
 
 ## Example
 
-```
+```text
 Implement user profile page with the following requirements:
 
 **Description:**

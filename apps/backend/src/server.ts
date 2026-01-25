@@ -3,7 +3,7 @@ import { app } from './app.js';
 const PORT = process.env.API_PORT || 3001;
 const HOST = process.env.API_HOST || 'localhost';
 
-const server = app.listen(PORT, () => {
+const server = app.listen(Number(PORT), HOST, () => {
   console.info(`
 🚀 Server is running!
 📍 URL: http://${HOST}:${PORT}
@@ -33,4 +33,13 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // Handle unhandled rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Initiating graceful shutdown due to unhandled rejection...');
+  gracefulShutdown('UNHANDLED_REJECTION');
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  console.error('Initiating graceful shutdown due to uncaught exception...');
+  gracefulShutdown('UNCAUGHT_EXCEPTION');
 });

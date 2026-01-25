@@ -75,14 +75,31 @@ export class UserController {
 // Success
 { success: true, data: { ... } }
 
-// Error
-{ success: false, error: "Error message" }
+// Error (standardized shape - see error-handling.md)
+{
+  success: false,
+  error: {
+    message: "User not found",
+    code: "NOT_FOUND",
+    details: { userId: "123" }  // optional, omit in production
+  }
+}
 
 // Paginated
 {
   success: true,
   data: [...],
   pagination: { page: 1, limit: 10, total: 100 }
+}
+
+// Paginated with error
+{
+  success: false,
+  error: {
+    message: "Invalid page number",
+    code: "VALIDATION_ERROR",
+    details: { page: -1, min: 1 }
+  }
 }
 ```
 
