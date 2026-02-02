@@ -1,72 +1,65 @@
+/* eslint-env browser */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import App from './App';
 
-// Mock the fetch API
-const mockHealthResponse = {
-  success: true,
-  status: 'healthy',
-  timestamp: new Date().toISOString(),
-  uptime: 100,
-  environment: 'test',
-};
-
-describe('App Component', () => {
+describe('App Component - Auth Flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('should render the header with UpGrad Learning title', () => {
-    // Mock fetch to return health data
+  it('should show email form when no token in localStorage', async () => {
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Login or Sign Up')).toBeInTheDocument();
+    });
+  });
+
+  it('should show authenticated state when session is valid', async () => {
+    localStorage.setItem('accessToken', 'valid-token');
+
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockHealthResponse),
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: {
+              user: { id: '1', email: 'test@example.com' },
+            },
+          }),
       })
     );
 
     render(<App />);
 
-    // Check for the main heading
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('🎓 UpGrad Learning');
-
-    // Check for subtitle
-    expect(screen.getByText('Fullstack Monorepo')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Welcome Back!')).toBeInTheDocument();
+    });
   });
 
-  it('should display tech stack information', () => {
+  it('should show email form if session check fails', async () => {
+    localStorage.setItem('accessToken', 'expired-token');
+
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockHealthResponse),
-      })
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({ success: false }) })
+        .mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({ success: false }) })
     );
 
     render(<App />);
 
-    // Verify tech stack items are displayed
-    expect(screen.getByText(/React 18/)).toBeInTheDocument();
-    expect(screen.getByText(/Vite/)).toBeInTheDocument();
-    expect(screen.getByText(/Express.js/)).toBeInTheDocument();
-    expect(screen.getByText(/Prisma/)).toBeInTheDocument();
-    expect(screen.getByText(/Turborepo/)).toBeInTheDocument();
-  });
-
-  it('should show loading state initially', () => {
-    // Mock fetch to be a pending promise
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockImplementation(() => new Promise(() => {}))
-    );
-
-    render(<App />);
-
-    expect(screen.getByText('⏳ Connecting...')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Login or Sign Up')).toBeInTheDocument();
+    });
   });
 });

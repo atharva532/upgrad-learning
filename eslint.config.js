@@ -34,6 +34,8 @@ export default [
         document: 'readonly',
         navigator: 'readonly',
         fetch: 'readonly',
+        localStorage: 'readonly',
+        HTMLInputElement: 'readonly',
       },
     },
     plugins: {
