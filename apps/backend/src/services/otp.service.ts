@@ -101,8 +101,8 @@ export async function requestOtp(
   const expiresAt = new Date(now + AUTH_CONFIG.OTP_EXPIRY_MINUTES * 60 * 1000);
   const resendAvailableAt = new Date(now + cooldownMs);
 
-  // Store OTP
-  await prisma.otpRecord.create({
+  // Store OTP (capture ID for potential cleanup)
+  const createdOtp = await prisma.otpRecord.create({
     data: {
       email: normalizedEmail,
       otpHash,
@@ -115,7 +115,11 @@ export async function requestOtp(
   // Send email (or log in development)
   const emailSent = await sendOtpEmail(normalizedEmail, otp);
 
-  if (!emailSent && process.env.NODE_ENV === 'production') {
+  // If email failed, delete the OTP record to prevent orphaned cooldowns
+  if (!emailSent) {
+    await prisma.otpRecord.delete({
+      where: { id: createdOtp.id },
+    });
     return {
       success: false,
       message: 'Failed to send OTP email. Please try again.',
@@ -290,12 +294,19 @@ async function sendOtpEmail(email: string, otp: string): Promise<boolean> {
   const resend = getResendClient();
 
   if (!resend) {
-    // Development mode - log OTP to console
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`📧 OTP for ${email}: ${otp}`);
-    console.log(`⏰ Expires in ${AUTH_CONFIG.OTP_EXPIRY_MINUTES} minutes`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    return true;
+    // Check if we're in development mode
+    if (process.env.NODE_ENV === 'development') {
+      // Development mode - log OTP to console and treat as success
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`📧 OTP for ${email}: ${otp}`);
+      console.log(`⏰ Expires in ${AUTH_CONFIG.OTP_EXPIRY_MINUTES} minutes`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      return true;
+    } else {
+      // Production/staging: missing email client is a FAILURE
+      console.error('❌ Resend client not configured (RESEND_API_KEY missing) - email not sent');
+      return false;
+    }
   }
 
   try {

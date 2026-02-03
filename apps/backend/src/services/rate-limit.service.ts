@@ -34,7 +34,7 @@ export async function checkRateLimit(
 
   // If record exists and window is still valid
   if (existingRecord && existingRecord.windowStart > windowStart) {
-    // Check if limit exceeded
+    // Check if already at limit before attempting increment
     if (existingRecord.count >= config.maxRequests) {
       const retryAfter = new Date(existingRecord.windowStart.getTime() + config.windowMs);
       return {
@@ -45,15 +45,38 @@ export async function checkRateLimit(
       };
     }
 
-    // Increment counter
-    const updated = await prisma.rateLimit.update({
+    // ATOMIC: Conditional increment - only succeeds if count < maxRequests
+    // This prevents race conditions where concurrent requests could exceed the limit
+    const result = await prisma.rateLimit.updateMany({
+      where: {
+        id: existingRecord.id,
+        count: { lt: config.maxRequests },
+        windowStart: existingRecord.windowStart,
+      },
+      data: {
+        count: { increment: 1 },
+      },
+    });
+
+    // If count === 0, a concurrent request beat us to the limit
+    if (result.count === 0) {
+      const retryAfter = new Date(existingRecord.windowStart.getTime() + config.windowMs);
+      return {
+        allowed: false,
+        remaining: 0,
+        retryAfter,
+        waitSeconds: Math.ceil((retryAfter.getTime() - now.getTime()) / 1000),
+      };
+    }
+
+    // Increment succeeded - fetch updated record to get actual count
+    const updated = await prisma.rateLimit.findUnique({
       where: { id: existingRecord.id },
-      data: { count: { increment: 1 } },
     });
 
     return {
       allowed: true,
-      remaining: config.maxRequests - updated.count,
+      remaining: updated ? config.maxRequests - updated.count : 0,
     };
   }
 

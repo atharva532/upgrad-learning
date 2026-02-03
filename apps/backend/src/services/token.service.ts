@@ -5,10 +5,20 @@
 
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { AUTH_CONFIG } from '../config/auth.config.js';
 import { hashToken, generateRefreshToken } from '../utils/otp.utils.js';
 import { getDeviceName } from '../utils/device.utils.js';
+
+// Type for Prisma transaction client (subset of PrismaClient)
+type TransactionClient = Omit<
+  typeof prisma,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$extends'
+>;
+
+// Union type that accepts both regular prisma and transaction client
+type PrismaClientLike = typeof prisma | TransactionClient | Prisma.TransactionClient;
 
 interface TokenPair {
   accessToken: string;
@@ -40,11 +50,13 @@ export async function createTokenPair(
 
 /**
  * Issue access + refresh tokens
+ * Accepts optional Prisma client for transaction support
  */
 async function issueTokenPair(
   user: UserForToken,
   familyId: string,
-  deviceInfo: { userAgent?: string; ipAddress?: string }
+  deviceInfo: { userAgent?: string; ipAddress?: string },
+  prismaClient: PrismaClientLike = prisma
 ): Promise<TokenPair> {
   // Generate access token
   const accessToken = jwt.sign(
@@ -62,8 +74,8 @@ async function issueTokenPair(
   const tokenHash = hashToken(refreshToken);
   const deviceName = getDeviceName(deviceInfo.userAgent);
 
-  // Store refresh token
-  await prisma.refreshToken.create({
+  // Store refresh token using provided client (for transaction support)
+  await prismaClient.refreshToken.create({
     data: {
       tokenHash,
       userId: user.id,
@@ -80,6 +92,7 @@ async function issueTokenPair(
 /**
  * Rotate refresh token - invalidate old, issue new
  * Implements token reuse detection for security
+ * ATOMIC: Uses Prisma transaction to prevent race conditions
  */
 export async function rotateRefreshToken(
   oldToken: string,
@@ -87,52 +100,64 @@ export async function rotateRefreshToken(
 ): Promise<TokenPair | null> {
   const oldTokenHash = hashToken(oldToken);
 
-  // Find the old token
-  const existingToken = await prisma.refreshToken.findUnique({
-    where: { tokenHash: oldTokenHash },
-    include: { user: true },
-  });
+  // Wrap entire operation in a transaction for atomicity
+  return prisma.$transaction(async (tx) => {
+    // Find the old token within transaction
+    const existingToken = await tx.refreshToken.findUnique({
+      where: { tokenHash: oldTokenHash },
+      include: { user: true },
+    });
 
-  if (!existingToken) {
-    return null; // Token not found
-  }
+    if (!existingToken) {
+      return null; // Token not found
+    }
 
-  // Check if token is expired or revoked
-  if (existingToken.revokedAt || existingToken.expiresAt < new Date()) {
-    return null;
-  }
+    // Check if token is expired or revoked
+    if (existingToken.revokedAt || existingToken.expiresAt < new Date()) {
+      return null;
+    }
 
-  // SECURITY: Check if token was already used (potential theft!)
-  if (existingToken.replacedBy) {
-    // Token reuse detected - revoke entire family!
-    console.warn(
-      `⚠️ Refresh token reuse detected! Family: ${existingToken.familyId}, User: ${existingToken.userId}`
+    // SECURITY: Check if token was already used (potential theft!)
+    if (existingToken.replacedBy) {
+      // Token reuse detected - revoke entire family within same transaction!
+      console.warn(
+        `⚠️ Refresh token reuse detected! Family: ${existingToken.familyId}, User: ${existingToken.userId}`
+      );
+      await revokeTokenFamily(existingToken.familyId, tx);
+      return null;
+    }
+
+    // Issue new token pair within transaction
+    const newPair = await issueTokenPair(
+      existingToken.user,
+      existingToken.familyId,
+      deviceInfo,
+      tx
     );
-    await revokeTokenFamily(existingToken.familyId);
-    return null;
-  }
+    const newTokenHash = hashToken(newPair.refreshToken);
 
-  // Issue new token pair
-  const newPair = await issueTokenPair(existingToken.user, existingToken.familyId, deviceInfo);
-  const newTokenHash = hashToken(newPair.refreshToken);
+    // Mark old token as replaced within transaction
+    await tx.refreshToken.update({
+      where: { id: existingToken.id },
+      data: {
+        revokedAt: new Date(),
+        replacedBy: newTokenHash,
+      },
+    });
 
-  // Mark old token as replaced
-  await prisma.refreshToken.update({
-    where: { id: existingToken.id },
-    data: {
-      revokedAt: new Date(),
-      replacedBy: newTokenHash,
-    },
+    return newPair;
   });
-
-  return newPair;
 }
 
 /**
  * Revoke all tokens in a family (security measure)
+ * Accepts optional Prisma client for transaction support
  */
-export async function revokeTokenFamily(familyId: string): Promise<void> {
-  await prisma.refreshToken.updateMany({
+export async function revokeTokenFamily(
+  familyId: string,
+  prismaClient: PrismaClientLike = prisma
+): Promise<void> {
+  await prismaClient.refreshToken.updateMany({
     where: { familyId, revokedAt: null },
     data: { revokedAt: new Date() },
   });
