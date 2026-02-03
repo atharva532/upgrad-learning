@@ -5,20 +5,20 @@
 
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { AUTH_CONFIG } from '../config/auth.config.js';
 import { hashToken, generateRefreshToken } from '../utils/otp.utils.js';
 import { getDeviceName } from '../utils/device.utils.js';
 
 // Type for Prisma transaction client (subset of PrismaClient)
+// This works without needing generated Prisma client types
 type TransactionClient = Omit<
   typeof prisma,
   '$connect' | '$disconnect' | '$on' | '$transaction' | '$extends'
 >;
 
-// Union type that accepts both regular prisma and transaction client
-type PrismaClientLike = typeof prisma | TransactionClient | Prisma.TransactionClient;
+// Type for Prisma client or transaction client
+type PrismaClientLike = typeof prisma | TransactionClient;
 
 interface TokenPair {
   accessToken: string;
@@ -101,7 +101,7 @@ export async function rotateRefreshToken(
   const oldTokenHash = hashToken(oldToken);
 
   // Wrap entire operation in a transaction for atomicity
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx: TransactionClient) => {
     // Find the old token within transaction
     const existingToken = await tx.refreshToken.findUnique({
       where: { tokenHash: oldTokenHash },
