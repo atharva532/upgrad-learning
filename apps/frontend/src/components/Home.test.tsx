@@ -1,12 +1,30 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
 import { Home } from './Home';
 
-describe('Home Component', () => {
-  const mockOnLogout = vi.fn();
-  const testUser = { id: '1', email: 'test@example.com' };
+// Mock the AuthContext
+const mockLogout = vi.fn();
+const mockNavigate = vi.fn();
 
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: '1', email: 'test@example.com' },
+    isNewUser: false,
+    logout: mockLogout,
+  }),
+}));
+
+describe('Home Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -15,72 +33,60 @@ describe('Home Component', () => {
     vi.unstubAllGlobals();
   });
 
+  const renderHome = () => {
+    return render(
+      <BrowserRouter>
+        <Home />
+      </BrowserRouter>
+    );
+  };
+
   it('should display welcome message for returning user', () => {
-    render(<Home user={testUser} isNewUser={false} onLogout={mockOnLogout} />);
+    renderHome();
 
-    expect(screen.getByText('Welcome Back!')).toBeInTheDocument();
-    expect(screen.getByText(/Ready to continue your learning journey/)).toBeInTheDocument();
-  });
-
-  it('should display welcome message for new user', () => {
-    render(<Home user={testUser} isNewUser={true} onLogout={mockOnLogout} />);
-
-    expect(screen.getByText('Welcome to UpGrad Learning!')).toBeInTheDocument();
-    expect(screen.getByText(/Your account has been created/)).toBeInTheDocument();
+    expect(screen.getByText('Welcome back, Learner!')).toBeInTheDocument();
   });
 
   it('should display user email', () => {
-    render(<Home user={testUser} isNewUser={false} onLogout={mockOnLogout} />);
+    renderHome();
 
     expect(screen.getByText(/test@example.com/)).toBeInTheDocument();
   });
 
   it('should have a logout button', () => {
-    render(<Home user={testUser} isNewUser={false} onLogout={mockOnLogout} />);
+    renderHome();
 
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });
 
-  it('should call logout endpoint and onLogout when logout clicked', async () => {
+  it('should display LearnSphere brand', () => {
+    renderHome();
+
+    expect(screen.getByText('LearnSphere')).toBeInTheDocument();
+  });
+
+  it('should display Continue Learning section', () => {
+    renderHome();
+
+    expect(screen.getByText('Continue Learning')).toBeInTheDocument();
+  });
+
+  it('should display course cards', () => {
+    renderHome();
+
+    expect(screen.getByText('Introduction to Web Development')).toBeInTheDocument();
+    expect(screen.getByText('React Fundamentals')).toBeInTheDocument();
+    expect(screen.getByText('TypeScript Essentials')).toBeInTheDocument();
+  });
+
+  it('should call logout and navigate when logout clicked', async () => {
     const user = userEvent.setup();
 
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      })
-    );
-
-    render(<Home user={testUser} isNewUser={false} onLogout={mockOnLogout} />);
+    renderHome();
 
     await user.click(screen.getByRole('button', { name: /logout/i }));
 
-    expect(vi.mocked(fetch)).toHaveBeenCalledWith(
-      '/api/auth/logout',
-      expect.objectContaining({
-        method: 'POST',
-        credentials: 'include',
-      })
-    );
-    expect(mockOnLogout).toHaveBeenCalledTimes(1);
-  });
-
-  it('should still call onLogout even if API call fails', async () => {
-    const user = userEvent.setup();
-
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network error')));
-
-    render(<Home user={testUser} isNewUser={false} onLogout={mockOnLogout} />);
-
-    await user.click(screen.getByRole('button', { name: /logout/i }));
-
-    expect(mockOnLogout).toHaveBeenCalledTimes(1);
-  });
-
-  it('should display emoji for welcome', () => {
-    render(<Home user={testUser} isNewUser={false} onLogout={mockOnLogout} />);
-
-    expect(screen.getByText('🎓')).toBeInTheDocument();
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 });

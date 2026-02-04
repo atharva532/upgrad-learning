@@ -12,19 +12,19 @@
   --card-bg: #ffffff;
   --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   --card-border-radius: 16px;
-  
+
   --text-primary: #1a1a2e;
   --text-secondary: #6b7280;
   --text-muted: #9ca3af;
-  
+
   --primary: #5b5fc7;
   --primary-hover: #4a4eb8;
   --primary-light: rgba(91, 95, 199, 0.1);
-  
+
   --input-border: #e5e7eb;
   --input-focus-border: #5b5fc7;
   --input-bg: #ffffff;
-  
+
   --error: #ef4444;
   --error-bg: #fef2f2;
   --success: #22c55e;
@@ -291,7 +291,259 @@ body {
   }
 }
 
-/* Responsive */
+/* ================================
+   LANDING PAGE STYLES
+   ================================ */
+
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: var(--bg-color);
+}
+
+.landing-hero {
+  text-align: center;
+  max-width: 720px;
+  width: 100%;
+}
+
+.landing-icon {
+  margin-bottom: 1.5rem;
+}
+
+.landing-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.landing-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.landing-illustration {
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.landing-illustration img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-cta {
+  display: inline-block;
+  padding: 0.875rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.btn-cta:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(91, 95, 199, 0.3);
+}
+
+.btn-cta:active {
+  transform: scale(0.98);
+}
+
+/* ================================
+   HOME / DASHBOARD STYLES
+   ================================ */
+
+.home-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.home-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--input-border);
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.home-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.home-brand svg {
+  width: 32px;
+  height: 32px;
+}
+
+.home-brand-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btn-small {
+  width: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.home-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.welcome-section {
+  margin-bottom: 3rem;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.courses-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.course-card {
+  background: var(--card-bg);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.course-thumbnail {
+  height: 160px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, rgba(91, 95, 199, 0.2) 100%);
+}
+
+.course-thumbnail.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-info {
+  padding: 1.25rem;
+}
+
+.course-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.course-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--input-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ================================
+   RESPONSIVE STYLES
+   ================================ */
+
+@media (max-width: 768px) {
+  .landing-title {
+    font-size: 2rem;
+  }
+
+  .landing-subtitle {
+    font-size: 1rem;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 480px) {
   .auth-card {
     padding: 2rem 1.5rem;
@@ -305,5 +557,31 @@ body {
 
   .otp-container {
     gap: 0.5rem;
+  }
+
+  .landing-title {
+    font-size: 1.75rem;
+  }
+
+  .landing-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .landing-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .btn-cta {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .home-main {
+    padding: 1.5rem 1rem;
+  }
+
+  .welcome-title {
+    font-size: 1.375rem;
   }
 }
