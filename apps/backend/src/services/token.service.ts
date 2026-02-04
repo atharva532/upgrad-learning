@@ -127,25 +127,60 @@ export async function rotateRefreshToken(
       return null;
     }
 
-    // Issue new token pair within transaction
-    const newPair = await issueTokenPair(
-      existingToken.user,
-      existingToken.familyId,
-      deviceInfo,
-      tx
-    );
-    const newTokenHash = hashToken(newPair.refreshToken);
+    // PRE-GENERATE new token and hash BEFORE conditional update (CAS pattern)
+    const newRefreshToken = generateRefreshToken();
+    const newTokenHash = hashToken(newRefreshToken);
+    const now = new Date();
 
-    // Mark old token as replaced within transaction
-    await tx.refreshToken.update({
-      where: { id: existingToken.id },
+    // ATOMIC CAS: Only succeed if replacedBy is still null and not revoked
+    // This prevents concurrent requests from both rotating the same token
+    const rotationResult = await tx.refreshToken.updateMany({
+      where: {
+        id: existingToken.id,
+        replacedBy: null, // CAS condition: must not be already replaced
+        revokedAt: null, // CAS condition: must not be revoked
+      },
       data: {
-        revokedAt: new Date(),
+        revokedAt: now,
         replacedBy: newTokenHash,
       },
     });
 
-    return newPair;
+    // Check if CAS succeeded
+    if (rotationResult.count === 0) {
+      // Another concurrent request already rotated or revoked this token
+      console.warn(
+        `⚠️ Token rotation race detected! Family: ${existingToken.familyId}, User: ${existingToken.userId}`
+      );
+      await revokeTokenFamily(existingToken.familyId, tx);
+      return null;
+    }
+
+    // CAS succeeded - now create the new token record
+    const deviceName = getDeviceName(deviceInfo.userAgent);
+    await tx.refreshToken.create({
+      data: {
+        tokenHash: newTokenHash,
+        userId: existingToken.userId,
+        familyId: existingToken.familyId,
+        expiresAt: new Date(Date.now() + AUTH_CONFIG.REFRESH_TOKEN_TTL_MS),
+        deviceName,
+        ipAddress: deviceInfo.ipAddress,
+      },
+    });
+
+    // Generate access token
+    const accessToken = jwt.sign(
+      {
+        userId: existingToken.user.id,
+        email: existingToken.user.email,
+        type: 'access',
+      } as AccessTokenPayload,
+      AUTH_CONFIG.JWT_SECRET,
+      { expiresIn: AUTH_CONFIG.ACCESS_TOKEN_TTL }
+    );
+
+    return { accessToken, refreshToken: newRefreshToken };
   });
 }
 
