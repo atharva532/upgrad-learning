@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Home } from './Home';
 
 // Mock the AuthContext
-const mockLogout = vi.fn();
+const mockLogout = vi.fn().mockResolvedValue(undefined);
 const mockNavigate = vi.fn();
 
 vi.mock('react-router-dom', async () => {
