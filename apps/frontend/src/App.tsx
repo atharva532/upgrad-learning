@@ -1,96 +1,132 @@
 import { useState, useEffect } from 'react';
+import { AuthForm } from './components/AuthForm';
+import { OtpForm } from './components/OtpForm';
+import { Home } from './components/Home';
 
-interface HealthStatus {
-  success: boolean;
-  status: string;
-  timestamp: string;
-  uptime: number;
-  environment: string;
+type AuthState = 'loading' | 'email' | 'otp' | 'authenticated';
+
+interface User {
+  id: string;
+  email: string;
 }
 
 function App() {
-  const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [authState, setAuthState] = useState<AuthState>('loading');
+  const [email, setEmail] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [isNewUser, setIsNewUser] = useState(false);
 
+  // Check session on mount
   useEffect(() => {
-    const checkHealth = async () => {
+    const checkSession = async () => {
+      const token = localStorage.getItem('accessToken');
+
+      if (!token) {
+        setAuthState('email');
+        return;
+      }
+
       try {
-        const response = await fetch('/api/health');
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+        const response = await fetch('/api/auth/session', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.data.user);
+
+          setAuthState('authenticated');
+        } else {
+          // Try to refresh token
+          const refreshResponse = await fetch('/api/auth/token/refresh', {
+            method: 'POST',
+            credentials: 'include',
+          });
+
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            localStorage.setItem('accessToken', refreshData.data.accessToken);
+
+            // Retry session check
+            const retryResponse = await fetch('/api/auth/session', {
+              headers: { Authorization: `Bearer ${refreshData.data.accessToken}` },
+            });
+
+            if (retryResponse.ok) {
+              const retryData = await retryResponse.json();
+              setUser(retryData.data.user);
+              setAuthState('authenticated');
+              return;
+            }
+          }
+
+          // Failed to refresh, clear and show login
+          localStorage.removeItem('accessToken');
+          setAuthState('email');
         }
-        const data = await response.json();
-        setHealth(data);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to connect');
-        setHealth(null);
-      } finally {
-        setLoading(false);
+      } catch {
+        localStorage.removeItem('accessToken');
+        setAuthState('email');
       }
     };
 
-    checkHealth();
-    const interval = setInterval(checkHealth, 5000);
-    return () => clearInterval(interval);
+    checkSession();
   }, []);
 
-  return (
-    <div className="app">
-      <header className="header">
-        <h1>🎓 UpGrad Learning</h1>
-        <p className="subtitle">Fullstack Monorepo</p>
-      </header>
+  const handleOtpSent = (submittedEmail: string) => {
+    setEmail(submittedEmail);
+    setAuthState('otp');
+  };
 
-      <main className="main">
-        <div className="card">
-          <h2>Backend Status</h2>
-          {loading ? (
-            <div className="status loading">⏳ Connecting...</div>
-          ) : error ? (
-            <div className="status error">
-              <span className="dot red"></span>❌ Disconnected: {error}
-            </div>
-          ) : health ? (
-            <div className="status success">
-              <span className="dot green"></span>✅ Connected
-              <div className="details">
-                <p>
-                  <strong>Status:</strong> {health.status}
-                </p>
-                <p>
-                  <strong>Environment:</strong> {health.environment}
-                </p>
-                <p>
-                  <strong>Uptime:</strong> {Math.floor(health.uptime)}s
-                </p>
-                <p>
-                  <strong>Last check:</strong> {new Date(health.timestamp).toLocaleTimeString()}
-                </p>
-              </div>
-            </div>
-          ) : null}
+  const handleAuthSuccess = (data: { user: User; accessToken: string; isNewUser: boolean }) => {
+    setUser(data.user);
+
+    setIsNewUser(data.isNewUser);
+    localStorage.setItem('accessToken', data.accessToken);
+    setAuthState('authenticated');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+
+    setIsNewUser(false);
+    localStorage.removeItem('accessToken');
+    setAuthState('email');
+  };
+
+  const handleBack = () => {
+    setEmail('');
+    setAuthState('email');
+  };
+
+  // Loading state
+  if (authState === 'loading') {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="loading-spinner"></div>
+          <p className="auth-subtitle">Loading...</p>
         </div>
+      </div>
+    );
+  }
 
-        <div className="card">
-          <h2>Tech Stack</h2>
-          <ul className="stack-list">
-            <li>⚛️ React 18 + TypeScript</li>
-            <li>⚡ Vite</li>
-            <li>🚀 Express.js</li>
-            <li>🗄️ Prisma + SQLite</li>
-            <li>📦 pnpm Workspaces</li>
-            <li>🔧 Turborepo</li>
-          </ul>
-        </div>
-      </main>
+  // Email input screen
+  if (authState === 'email') {
+    return <AuthForm onOtpSent={handleOtpSent} />;
+  }
 
-      <footer className="footer">
-        <p>Built with ❤️ for learning</p>
-      </footer>
-    </div>
-  );
+  // OTP verification screen
+  if (authState === 'otp') {
+    return <OtpForm email={email} onSuccess={handleAuthSuccess} onBack={handleBack} />;
+  }
+
+  // Authenticated - show home
+  if (authState === 'authenticated' && user) {
+    return <Home user={user} isNewUser={isNewUser} onLogout={handleLogout} />;
+  }
+
+  return null;
 }
 
 export default App;

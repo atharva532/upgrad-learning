@@ -13,4 +13,81 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  otpRecords    OtpRecord[]
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+}
+
+model OtpRecord {
+  id        String   @id @default(uuid())
+  email     String
+  otpHash   String   // HMAC-SHA256 hash of OTP
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Track IP for security auditing
+  ipAddress String?
+  userAgent String?
+
+  // Optional relation to user (null for new signups)
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, expiresAt])
+  @@index([email, createdAt])
+  @@index([ipAddress, createdAt])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique // SHA-256 hash of token
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  // Token family for rotation tracking
+  familyId   String  // All rotated tokens share this ID
+  replacedBy String? // Hash of the token that replaced this one
+
+  // Device tracking
+  deviceName String?
+  ipAddress  String?
+  lastUsedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([familyId])
+}
+
+model RateLimit {
+  id          String   @id @default(uuid())
+  identifier  String   // email or IP address
+  type        String   // "otp_request" | "otp_verify" | "ip_request"
+  windowStart DateTime @default(now())
+  count       Int      @default(1)
+
+  @@unique([identifier, type])
+  @@index([windowStart])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String
+  action    String   // OTP_REQUESTED, OTP_VERIFIED, OTP_FAILED, LOGIN_SUCCESS, LOGOUT
+  ipAddress String?
+  userAgent String?
+  metadata  Json?    // Additional context
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
 }

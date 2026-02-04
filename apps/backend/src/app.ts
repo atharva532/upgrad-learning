@@ -2,9 +2,11 @@ import 'dotenv/config';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import authRoutes from './routes/auth.routes.js';
 
 // Read version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +31,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Health check route
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -51,6 +54,9 @@ app.get('/', (_req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// API Routes
+app.use('/api/auth', authRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
