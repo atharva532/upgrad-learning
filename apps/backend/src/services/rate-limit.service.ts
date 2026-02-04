@@ -80,27 +80,156 @@ export async function checkRateLimit(
     };
   }
 
-  // Window expired or no record - create/reset
-  await prisma.rateLimit.upsert({
-    where: {
-      identifier_type: { identifier, type },
-    },
-    update: {
-      count: 1,
-      windowStart: now,
-    },
-    create: {
-      identifier,
-      type,
-      count: 1,
-      windowStart: now,
-    },
-  });
+  // Window expired or no record exists
+  // Try atomic conditional reset first (for expired windows)
+  if (existingRecord) {
+    // ATOMIC: Only reset if this record's windowStart is still expired
+    // This prevents concurrent requests from each resetting the counter
+    const resetResult = await prisma.rateLimit.updateMany({
+      where: {
+        identifier,
+        type,
+        windowStart: { lt: windowStart }, // Only if window is expired
+      },
+      data: {
+        count: 1,
+        windowStart: now,
+      },
+    });
 
-  return {
-    allowed: true,
-    remaining: config.maxRequests - 1,
-  };
+    if (resetResult.count === 1) {
+      // This request won the reset race
+      return {
+        allowed: true,
+        remaining: config.maxRequests - 1,
+      };
+    }
+
+    // resetResult.count === 0 means another request already reset the window
+    // Fall back to the in-window increment logic by re-fetching
+    const freshRecord = await prisma.rateLimit.findUnique({
+      where: {
+        identifier_type: { identifier, type },
+      },
+    });
+
+    if (freshRecord && freshRecord.windowStart > windowStart) {
+      // Window was reset by another request, now apply increment logic
+      if (freshRecord.count >= config.maxRequests) {
+        const retryAfter = new Date(freshRecord.windowStart.getTime() + config.windowMs);
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfter,
+          waitSeconds: Math.ceil((retryAfter.getTime() - now.getTime()) / 1000),
+        };
+      }
+
+      // Atomic conditional increment
+      const incrementResult = await prisma.rateLimit.updateMany({
+        where: {
+          id: freshRecord.id,
+          count: { lt: config.maxRequests },
+          windowStart: freshRecord.windowStart,
+        },
+        data: {
+          count: { increment: 1 },
+        },
+      });
+
+      if (incrementResult.count === 0) {
+        const retryAfter = new Date(freshRecord.windowStart.getTime() + config.windowMs);
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfter,
+          waitSeconds: Math.ceil((retryAfter.getTime() - now.getTime()) / 1000),
+        };
+      }
+
+      const updated = await prisma.rateLimit.findUnique({
+        where: { id: freshRecord.id },
+      });
+
+      return {
+        allowed: true,
+        remaining: updated ? config.maxRequests - updated.count : 0,
+      };
+    }
+  }
+
+  // No record exists - create new one
+  try {
+    await prisma.rateLimit.create({
+      data: {
+        identifier,
+        type,
+        count: 1,
+        windowStart: now,
+      },
+    });
+
+    return {
+      allowed: true,
+      remaining: config.maxRequests - 1,
+    };
+  } catch {
+    // Handle race condition: another request created the record
+    // Re-fetch and apply increment logic
+    const newRecord = await prisma.rateLimit.findUnique({
+      where: {
+        identifier_type: { identifier, type },
+      },
+    });
+
+    if (newRecord) {
+      if (newRecord.count >= config.maxRequests) {
+        const retryAfter = new Date(newRecord.windowStart.getTime() + config.windowMs);
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfter,
+          waitSeconds: Math.ceil((retryAfter.getTime() - now.getTime()) / 1000),
+        };
+      }
+
+      const incrementResult = await prisma.rateLimit.updateMany({
+        where: {
+          id: newRecord.id,
+          count: { lt: config.maxRequests },
+          windowStart: newRecord.windowStart,
+        },
+        data: {
+          count: { increment: 1 },
+        },
+      });
+
+      if (incrementResult.count === 0) {
+        const retryAfter = new Date(newRecord.windowStart.getTime() + config.windowMs);
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfter,
+          waitSeconds: Math.ceil((retryAfter.getTime() - now.getTime()) / 1000),
+        };
+      }
+
+      const updated = await prisma.rateLimit.findUnique({
+        where: { id: newRecord.id },
+      });
+
+      return {
+        allowed: true,
+        remaining: updated ? config.maxRequests - updated.count : 0,
+      };
+    }
+
+    // Very unlikely: record disappeared, treat as allowed
+    return {
+      allowed: true,
+      remaining: config.maxRequests - 1,
+    };
+  }
 }
 
 /**
