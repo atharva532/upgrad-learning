@@ -18,6 +18,30 @@ model User {
   otpRecords    OtpRecord[]
   refreshTokens RefreshToken[]
   auditLogs     AuditLog[]
+  userInterests UserInterest[]
+}
+
+// Learning interests for personalized recommendations
+model Interest {
+  id        String         @id @default(uuid())
+  name      String         @unique
+  createdAt DateTime       @default(now())
+  users     UserInterest[]
+}
+
+// User's selected interests during onboarding
+model UserInterest {
+  id         String   @id @default(uuid())
+  userId     String
+  interestId String
+  weight     Float    @default(1.0)
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, interestId])
+  @@index([userId])
 }
 
 model OtpRecord {

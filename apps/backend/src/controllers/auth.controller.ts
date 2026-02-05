@@ -301,10 +301,20 @@ export async function getSessionController(req: AuthRequest, res: Response): Pro
       return;
     }
 
+    // Check if user has completed onboarding (has any interests)
+    // Using raw query to avoid TypeScript server caching issues with new Prisma models
+    const interestCount = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(*) as count FROM "UserInterest" WHERE "userId" = ${req.user.userId}
+    `;
+    const hasCompletedOnboarding = Number(interestCount[0].count) > 0;
+
     res.status(200).json({
       success: true,
       authenticated: true,
-      data: { user },
+      data: {
+        user,
+        hasCompletedOnboarding,
+      },
     });
   } catch (error) {
     console.error('Session check error:', error);

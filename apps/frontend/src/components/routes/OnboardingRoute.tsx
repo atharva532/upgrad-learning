@@ -2,11 +2,16 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-interface ProtectedRouteProps {
+interface OnboardingRouteProps {
   children: React.ReactNode;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+/**
+ * Route guard for onboarding screens
+ * - Requires authentication
+ * - Redirects to /home if user has already completed onboarding
+ */
+export function OnboardingRoute({ children }: OnboardingRouteProps) {
   const { isAuthenticated, isLoading, hasCompletedOnboarding } = useAuth();
   const location = useLocation();
 
@@ -21,14 +26,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // Not authenticated - redirect to login
   if (!isAuthenticated) {
-    // Redirect to login while preserving the intended destination
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If authenticated but hasn't completed onboarding, redirect to interests
-  if (!hasCompletedOnboarding) {
-    return <Navigate to="/onboarding/interests" replace />;
+  // Already completed onboarding - redirect to home
+  if (hasCompletedOnboarding) {
+    return <Navigate to="/home" replace />;
   }
 
   return <>{children}</>;
