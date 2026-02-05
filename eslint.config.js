@@ -58,7 +58,7 @@ export default [
     },
   },
   {
-    ignores: ['dist', 'node_modules', '*.config.js', '*.config.ts', '.husky'],
+    ignores: ['dist', 'node_modules', '*.config.js', '*.config.ts', '.husky', '**/assets/**'],
   },
   prettier,
 ];
