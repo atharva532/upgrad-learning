@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/routes/ProtectedRoute';
 import { PublicRoute } from './components/routes/PublicRoute';
+import { OnboardingRoute } from './components/routes/OnboardingRoute';
 import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
+import { InterestSelection } from './pages/InterestSelection';
 import { Home } from './components/Home';
 
 function App() {
@@ -24,7 +26,17 @@ function App() {
             }
           />
 
-          {/* Home/Dashboard - protected, requires authentication */}
+          {/* Onboarding - interest selection */}
+          <Route
+            path="/onboarding/interests"
+            element={
+              <OnboardingRoute>
+                <InterestSelection />
+              </OnboardingRoute>
+            }
+          />
+
+          {/* Home/Dashboard - protected, requires authentication + completed onboarding */}
           <Route
             path="/home"
             element={

@@ -57,6 +57,7 @@ describe('App Component - Routing and Auth Flow', () => {
             success: true,
             data: {
               user: { id: '1', email: 'test@example.com' },
+              hasCompletedOnboarding: true,
             },
           }),
       })
@@ -82,6 +83,7 @@ describe('App Component - Routing and Auth Flow', () => {
             success: true,
             data: {
               user: { id: '1', email: 'test@example.com' },
+              hasCompletedOnboarding: true,
             },
           }),
       })
@@ -128,7 +130,10 @@ describe('App Component - Routing and Auth Flow', () => {
       json: () =>
         Promise.resolve({
           success: true,
-          data: { user: { id: '1', email: 'test@example.com' } },
+          data: {
+            user: { id: '1', email: 'test@example.com' },
+            hasCompletedOnboarding: true,
+          },
         }),
     });
 

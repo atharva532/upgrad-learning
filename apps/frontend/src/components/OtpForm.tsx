@@ -6,6 +6,7 @@ interface OtpFormProps {
     user: { id: string; email: string };
     accessToken: string;
     isNewUser: boolean;
+    hasCompletedOnboarding: boolean;
   }) => void;
   onBack: () => void;
 }

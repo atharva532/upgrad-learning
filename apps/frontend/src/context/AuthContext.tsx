@@ -10,8 +10,15 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   isNewUser: boolean;
-  login: (accessToken: string, user: User, isNewUser?: boolean) => void;
-  logout: () => void;
+  hasCompletedOnboarding: boolean;
+  login: (
+    accessToken: string,
+    user: User,
+    isNewUser?: boolean,
+    hasCompletedOnboarding?: boolean
+  ) => void;
+  logout: () => Promise<void>;
+  setOnboardingComplete: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isNewUser, setIsNewUser] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   // Check session on mount
   useEffect(() => {
@@ -39,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (response.ok) {
           const data = await response.json();
           setUser(data.data.user);
+          setHasCompletedOnboarding(data.data.hasCompletedOnboarding ?? false);
           setIsLoading(false);
         } else {
           // Try to refresh token
@@ -59,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (retryResponse.ok) {
               const retryData = await retryResponse.json();
               setUser(retryData.data.user);
+              setHasCompletedOnboarding(retryData.data.hasCompletedOnboarding ?? false);
               setIsLoading(false);
               return;
             }
@@ -77,10 +87,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = (accessToken: string, userData: User, newUser = false) => {
+  const login = (
+    accessToken: string,
+    userData: User,
+    newUser = false,
+    completedOnboarding?: boolean
+  ) => {
     localStorage.setItem('accessToken', accessToken);
     setUser(userData);
     setIsNewUser(newUser);
+    // Use provided value or default to false for new users, true for returning users
+    setHasCompletedOnboarding(completedOnboarding ?? !newUser);
   };
 
   const logout = async () => {
@@ -95,6 +112,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('accessToken');
     setUser(null);
     setIsNewUser(false);
+    setHasCompletedOnboarding(false);
+  };
+
+  const setOnboardingComplete = () => {
+    setHasCompletedOnboarding(true);
+    setIsNewUser(false);
   };
 
   return (
@@ -104,8 +127,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         isNewUser,
+        hasCompletedOnboarding,
         login,
         logout,
+        setOnboardingComplete,
       }}
     >
       {children}
