@@ -13,6 +13,7 @@ import {
   revokeSession,
   revokeAllUserTokens,
 } from '../services/token.service.js';
+import { hasCompletedOnboarding } from '../services/interest.service.js';
 import { hashToken } from '../utils/otp.utils.js';
 import { getClientIp } from '../utils/device.utils.js';
 import { AUTH_CONFIG } from '../config/auth.config.js';
@@ -137,10 +138,7 @@ export async function verifyOtpController(req: Request, res: Response): Promise<
     });
 
     // Check if user has completed onboarding (has any interests)
-    const interestCount = await prisma.$queryRaw<[{ count: bigint }]>`
-      SELECT COUNT(*) as count FROM "UserInterest" WHERE "userId" = ${result.user.id}
-    `;
-    const hasCompletedOnboarding = Number(interestCount[0].count) > 0;
+    const completedOnboarding = await hasCompletedOnboarding(result.user.id);
 
     // Set refresh token as HTTP-only cookie
     res.cookie('refreshToken', refreshToken, AUTH_CONFIG.COOKIE_OPTIONS);
@@ -152,7 +150,7 @@ export async function verifyOtpController(req: Request, res: Response): Promise<
         user: result.user,
         accessToken,
         isNewUser: result.isNewUser,
-        hasCompletedOnboarding,
+        hasCompletedOnboarding: completedOnboarding,
       },
     });
   } catch (error) {
@@ -309,18 +307,14 @@ export async function getSessionController(req: AuthRequest, res: Response): Pro
     }
 
     // Check if user has completed onboarding (has any interests)
-    // Using raw query to avoid TypeScript server caching issues with new Prisma models
-    const interestCount = await prisma.$queryRaw<[{ count: bigint }]>`
-      SELECT COUNT(*) as count FROM "UserInterest" WHERE "userId" = ${req.user.userId}
-    `;
-    const hasCompletedOnboarding = Number(interestCount[0].count) > 0;
+    const completedOnboarding = await hasCompletedOnboarding(req.user.userId);
 
     res.status(200).json({
       success: true,
       authenticated: true,
       data: {
         user,
-        hasCompletedOnboarding,
+        hasCompletedOnboarding: completedOnboarding,
       },
     });
   } catch (error) {
