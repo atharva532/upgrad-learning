@@ -26,21 +26,24 @@ export async function getAllInterests() {
  * @param interestIds - Array of interest IDs to save
  */
 export async function saveUserInterests(userId: string, interestIds: string[]) {
-  // Delete existing interests (if any) to handle re-submission
-  await prisma.userInterest.deleteMany({
-    where: { userId },
-  });
+  // Use transaction to ensure atomicity - both delete and create succeed or both fail
+  return prisma.$transaction(async (tx) => {
+    // Delete existing interests (if any) to handle re-submission
+    await tx.userInterest.deleteMany({
+      where: { userId },
+    });
 
-  // Create new user interests with default weight
-  const userInterests = await prisma.userInterest.createMany({
-    data: interestIds.map((interestId) => ({
-      userId,
-      interestId,
-      weight: 1.0,
-    })),
-  });
+    // Create new user interests with default weight
+    const userInterests = await tx.userInterest.createMany({
+      data: interestIds.map((interestId) => ({
+        userId,
+        interestId,
+        weight: 1.0,
+      })),
+    });
 
-  return userInterests;
+    return userInterests;
+  });
 }
 
 /**
