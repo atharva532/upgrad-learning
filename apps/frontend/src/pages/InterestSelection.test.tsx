@@ -170,5 +170,9 @@ describe('InterestSelection', () => {
     await waitFor(() => {
       expect(mockSetOnboardingComplete).toHaveBeenCalled();
     });
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/home', { replace: true });
+    });
   });
 });
