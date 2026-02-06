@@ -4,7 +4,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { InterestSelection } from './InterestSelection';
 import * as interestService from '../services/interestService';
-import { AuthProvider } from '../context/AuthContext';
 
 // Mock the interest service
 vi.mock('../services/interestService', () => ({
@@ -22,6 +21,24 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Mock setOnboardingComplete function
+const mockSetOnboardingComplete = vi.fn();
+
+// Mock the AuthContext to avoid triggering real fetch calls
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user', email: 'test@example.com' },
+    isAuthenticated: true,
+    isLoading: false,
+    isNewUser: true,
+    hasCompletedOnboarding: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    setOnboardingComplete: mockSetOnboardingComplete,
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const mockInterests = [
   { id: 'web-dev', name: 'Web Development' },
   { id: 'data-science', name: 'Data Science' },
@@ -29,17 +46,12 @@ const mockInterests = [
 ];
 
 function renderWithProviders(component: React.ReactElement) {
-  return render(
-    <AuthProvider>
-      <BrowserRouter>{component}</BrowserRouter>
-    </AuthProvider>
-  );
+  return render(<BrowserRouter>{component}</BrowserRouter>);
 }
 
 describe('InterestSelection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.setItem('accessToken', 'test-token');
     (interestService.getInterests as ReturnType<typeof vi.fn>).mockResolvedValue(mockInterests);
     (interestService.saveUserInterests as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
   });
@@ -153,6 +165,10 @@ describe('InterestSelection', () => {
 
     await waitFor(() => {
       expect(interestService.saveUserInterests).toHaveBeenCalledWith(['web-dev']);
+    });
+
+    await waitFor(() => {
+      expect(mockSetOnboardingComplete).toHaveBeenCalled();
     });
   });
 });
