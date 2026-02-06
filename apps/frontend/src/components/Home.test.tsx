@@ -43,17 +43,15 @@ vi.mock('../services/contentService', () => ({
       category: 'Data Science',
     },
   ]),
-  getExplorationContent: vi
-    .fn()
-    .mockResolvedValue([
-      {
-        id: '3',
-        title: 'Explore Video',
-        thumbnail: 'thumb3.jpg',
-        duration: 2400,
-        category: 'Exploration',
-      },
-    ]),
+  getExplorationContent: vi.fn().mockResolvedValue([
+    {
+      id: '3',
+      title: 'Explore Video',
+      thumbnail: 'thumb3.jpg',
+      duration: 2400,
+      category: 'Exploration',
+    },
+  ]),
   saveWatchProgress: vi.fn(),
 }));
 
