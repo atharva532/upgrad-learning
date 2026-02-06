@@ -57,6 +57,8 @@ export function Home() {
     console.log('Resuming video:', videoId);
     // Simulate progress update
     saveWatchProgress(videoId, Math.min(100, (continueVideo?.progress || 0) + 10));
+    // Refresh continue watching to update UI
+    getContinueWatching().then(setContinueVideo);
   };
 
   const handleWatch = (videoId: string) => {
