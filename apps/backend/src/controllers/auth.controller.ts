@@ -136,6 +136,12 @@ export async function verifyOtpController(req: Request, res: Response): Promise<
       ipAddress,
     });
 
+    // Check if user has completed onboarding (has any interests)
+    const interestCount = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(*) as count FROM "UserInterest" WHERE "userId" = ${result.user.id}
+    `;
+    const hasCompletedOnboarding = Number(interestCount[0].count) > 0;
+
     // Set refresh token as HTTP-only cookie
     res.cookie('refreshToken', refreshToken, AUTH_CONFIG.COOKIE_OPTIONS);
 
@@ -146,6 +152,7 @@ export async function verifyOtpController(req: Request, res: Response): Promise<
         user: result.user,
         accessToken,
         isNewUser: result.isNewUser,
+        hasCompletedOnboarding,
       },
     });
   } catch (error) {

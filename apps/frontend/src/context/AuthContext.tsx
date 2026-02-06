@@ -11,7 +11,12 @@ interface AuthContextType {
   isLoading: boolean;
   isNewUser: boolean;
   hasCompletedOnboarding: boolean;
-  login: (accessToken: string, user: User, isNewUser?: boolean) => void;
+  login: (
+    accessToken: string,
+    user: User,
+    isNewUser?: boolean,
+    hasCompletedOnboarding?: boolean
+  ) => void;
   logout: () => Promise<void>;
   setOnboardingComplete: () => void;
 }
@@ -82,14 +87,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = (accessToken: string, userData: User, newUser = false) => {
+  const login = (
+    accessToken: string,
+    userData: User,
+    newUser = false,
+    completedOnboarding?: boolean
+  ) => {
     localStorage.setItem('accessToken', accessToken);
     setUser(userData);
     setIsNewUser(newUser);
-    // New users haven't completed onboarding yet
-    if (newUser) {
-      setHasCompletedOnboarding(false);
-    }
+    // Use provided value or default to false for new users, true for returning users
+    setHasCompletedOnboarding(completedOnboarding ?? !newUser);
   };
 
   const logout = async () => {

@@ -30,8 +30,9 @@ export function Login() {
     user: { id: string; email: string };
     accessToken: string;
     isNewUser: boolean;
+    hasCompletedOnboarding: boolean;
   }) => {
-    login(data.accessToken, data.user, data.isNewUser);
+    login(data.accessToken, data.user, data.isNewUser, data.hasCompletedOnboarding);
     navigate(from, { replace: true });
   };
 
