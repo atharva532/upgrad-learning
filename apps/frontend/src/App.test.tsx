@@ -94,7 +94,7 @@ describe('App Component - Routing and Auth Flow', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Welcome back, Learner!')).toBeInTheDocument();
-      expect(screen.getByText('Continue Learning')).toBeInTheDocument();
+      expect(screen.getByText('Recommended for You')).toBeInTheDocument();
     });
   });
 

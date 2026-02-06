@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { Home } from './Home';
@@ -22,6 +22,37 @@ vi.mock('../context/AuthContext', () => ({
     isNewUser: false,
     logout: mockLogout,
   }),
+}));
+
+// Mock the content service
+vi.mock('../services/contentService', () => ({
+  getContinueWatching: vi.fn().mockResolvedValue(null),
+  getRecommendations: vi.fn().mockResolvedValue([
+    {
+      id: '1',
+      title: 'Test Video 1',
+      thumbnail: 'thumb1.jpg',
+      duration: 1200,
+      category: 'Web Dev',
+    },
+    {
+      id: '2',
+      title: 'Test Video 2',
+      thumbnail: 'thumb2.jpg',
+      duration: 1800,
+      category: 'Data Science',
+    },
+  ]),
+  getExplorationContent: vi.fn().mockResolvedValue([
+    {
+      id: '3',
+      title: 'Explore Video',
+      thumbnail: 'thumb3.jpg',
+      duration: 2400,
+      category: 'Exploration',
+    },
+  ]),
+  saveWatchProgress: vi.fn(),
 }));
 
 describe('Home Component', () => {
@@ -65,18 +96,20 @@ describe('Home Component', () => {
     expect(screen.getByText('LearnSphere')).toBeInTheDocument();
   });
 
-  it('should display Continue Learning section', () => {
+  it('should display Recommended for You section', async () => {
     renderHome();
 
-    expect(screen.getByText('Continue Learning')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Recommended for You')).toBeInTheDocument();
+    });
   });
 
-  it('should display course cards', () => {
+  it('should display Explore Something New section', async () => {
     renderHome();
 
-    expect(screen.getByText('Introduction to Web Development')).toBeInTheDocument();
-    expect(screen.getByText('React Fundamentals')).toBeInTheDocument();
-    expect(screen.getByText('TypeScript Essentials')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Explore Something New')).toBeInTheDocument();
+    });
   });
 
   it('should call logout and navigate when logout clicked', async () => {
