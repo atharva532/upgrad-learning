@@ -71,14 +71,15 @@ describe('Interest Controller', () => {
       expect(response.body.success).toBe(false);
     });
 
-    it('should return 400 if interestIds is not an array', async () => {
+    it('should return 401 with invalid token before body validation occurs', async () => {
       const response = await request(app)
         .post('/api/interests/user')
         .set('Authorization', 'Bearer invalid-token')
         .send({ interestIds: 'not-an-array' });
 
-      // Will be 401 because token is invalid
+      // Auth middleware rejects invalid token before body validation
       expect(response.status).toBe(401);
+      expect(response.body.success).toBe(false);
     });
 
     it('should return 401 with invalid token format', async () => {
