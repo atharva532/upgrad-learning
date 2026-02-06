@@ -1,13 +1,71 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Video } from '../types/content.types';
+import {
+  getContinueWatching,
+  getRecommendations,
+  getExplorationContent,
+  saveWatchProgress,
+} from '../services/contentService';
+import { ContinueWatching, RecommendationsSection, ExplorationSection } from './homepage';
 
 export function Home() {
-  const { user, isNewUser, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // State for homepage sections
+  const [continueVideo, setContinueVideo] = useState<Video | null>(null);
+  const [recommendations, setRecommendations] = useState<Video[]>([]);
+  const [exploration, setExploration] = useState<Video[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+  const [isLoadingExploration, setIsLoadingExploration] = useState(true);
+
+  useEffect(() => {
+    async function loadHomepageContent() {
+      try {
+        // Load continue watching
+        const continueWatching = await getContinueWatching();
+        setContinueVideo(continueWatching);
+
+        // Load recommendations (would use user interests in production)
+        const recs = await getRecommendations([]);
+        setRecommendations(recs);
+        setIsLoadingRecommendations(false);
+
+        // Load exploration content
+        const explore = await getExplorationContent();
+        setExploration(explore);
+        setIsLoadingExploration(false);
+      } catch (error) {
+        console.error('Error loading homepage content:', error);
+        setIsLoadingRecommendations(false);
+        setIsLoadingExploration(false);
+      }
+    }
+
+    loadHomepageContent();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const handleResume = (videoId: string) => {
+    // In production, navigate to video player
+    console.log('Resuming video:', videoId);
+    // Simulate progress update
+    saveWatchProgress(videoId, Math.min(100, (continueVideo?.progress || 0) + 10));
+  };
+
+  const handleWatch = (videoId: string) => {
+    // In production, navigate to video player
+    console.log('Starting video:', videoId);
+    // Simulate starting a new video
+    saveWatchProgress(videoId, 5);
+    // Refresh continue watching
+    getContinueWatching().then(setContinueVideo);
   };
 
   if (!user) {
@@ -36,68 +94,35 @@ export function Home() {
             </svg>
             <span className="home-brand-text">LearnSphere</span>
           </div>
-          <button onClick={handleLogout} className="btn-secondary btn-small">
-            Logout
-          </button>
+          <div className="home-header-actions">
+            <span className="user-email">{user.email}</span>
+            <button onClick={handleLogout} className="btn-secondary btn-small">
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="home-main">
         <section className="welcome-section">
-          <h1 className="welcome-title">
-            {isNewUser ? 'Welcome to LearnSphere!' : 'Welcome back, Learner!'}
-          </h1>
-          <p className="welcome-subtitle">
-            {isNewUser
-              ? 'Your account has been created. Start exploring our courses!'
-              : `Signed in as ${user.email}`}
-          </p>
+          <h1 className="welcome-title">Welcome back, Learner!</h1>
+          <p className="welcome-subtitle">Pick up where you left off or discover something new.</p>
         </section>
 
-        <section className="courses-section">
-          <h2 className="section-title">Continue Learning</h2>
-          <div className="courses-grid">
-            {/* Placeholder course cards */}
-            <div className="course-card">
-              <div className="course-thumbnail placeholder"></div>
-              <div className="course-info">
-                <h3 className="course-title">Introduction to Web Development</h3>
-                <div className="course-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: '65%' }}></div>
-                  </div>
-                  <span className="progress-text">65% complete</span>
-                </div>
-              </div>
-            </div>
+        {/* Fixed Section Order: Continue Watching → Recommendations → Exploration */}
+        <ContinueWatching video={continueVideo} onResume={handleResume} />
 
-            <div className="course-card">
-              <div className="course-thumbnail placeholder"></div>
-              <div className="course-info">
-                <h3 className="course-title">React Fundamentals</h3>
-                <div className="course-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: '30%' }}></div>
-                  </div>
-                  <span className="progress-text">30% complete</span>
-                </div>
-              </div>
-            </div>
+        <RecommendationsSection
+          videos={recommendations}
+          isLoading={isLoadingRecommendations}
+          onWatch={handleWatch}
+        />
 
-            <div className="course-card">
-              <div className="course-thumbnail placeholder"></div>
-              <div className="course-info">
-                <h3 className="course-title">TypeScript Essentials</h3>
-                <div className="course-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: '10%' }}></div>
-                  </div>
-                  <span className="progress-text">10% complete</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ExplorationSection
+          videos={exploration}
+          isLoading={isLoadingExploration}
+          onWatch={handleWatch}
+        />
       </main>
     </div>
   );
