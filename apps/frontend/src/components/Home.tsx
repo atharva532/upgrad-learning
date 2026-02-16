@@ -8,6 +8,7 @@ import {
   getExplorationContent,
   saveWatchProgress,
 } from '../services/contentService';
+import { getUserInterests } from '../services/interestService';
 import { ContinueWatching, RecommendationsSection, ExplorationSection } from './homepage';
 
 export function Home() {
@@ -28,8 +29,15 @@ export function Home() {
         const continueWatching = await getContinueWatching();
         setContinueVideo(continueWatching);
 
-        // Load recommendations (would use user interests in production)
-        const recs = await getRecommendations([]);
+        // Load user interests and get personalized recommendations
+        let interestNames: string[] = [];
+        try {
+          const interests = await getUserInterests();
+          interestNames = interests.map((i) => i.name);
+        } catch {
+          console.warn('Could not fetch user interests, using defaults');
+        }
+        const recs = await getRecommendations(interestNames);
         setRecommendations(recs);
         setIsLoadingRecommendations(false);
 

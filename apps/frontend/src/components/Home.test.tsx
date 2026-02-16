@@ -24,6 +24,11 @@ vi.mock('../context/AuthContext', () => ({
   }),
 }));
 
+// Mock the interest service
+vi.mock('../services/interestService', () => ({
+  getUserInterests: vi.fn().mockResolvedValue([{ id: '1', name: 'Web Development' }]),
+}));
+
 // Mock the content service
 vi.mock('../services/contentService', () => ({
   getContinueWatching: vi.fn().mockResolvedValue(null),

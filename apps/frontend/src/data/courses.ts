@@ -147,18 +147,16 @@ export const COURSES: Video[] = [
   },
 ];
 
-// Map interests to course categories
+// Map interest names (as stored in DB) to course categories
 export const INTEREST_CATEGORY_MAP: Record<string, string[]> = {
-  'web-dev': ['Web Development'],
-  'data-science': ['Data Science'],
-  'ai-ml': ['Artificial Intelligence'],
-  'mobile-dev': ['Mobile Development'],
-  'ui-ux': ['Design'],
-  cloud: ['Cloud Computing'],
-  devops: ['DevOps'],
-  cybersecurity: ['Cloud Computing', 'DevOps'],
-  blockchain: ['Web Development'],
-  iot: ['Mobile Development', 'Cloud Computing'],
+  'Python Programming': ['Data Science', 'Artificial Intelligence'],
+  'Data Science': ['Data Science'],
+  'UI/UX Design': ['Design'],
+  'Digital Marketing': ['Marketing'],
+  'Cloud Computing': ['Cloud Computing'],
+  Cybersecurity: ['Cloud Computing', 'DevOps'],
+  'React Framework': ['Web Development'],
+  'Personal Finance': ['Finance'],
 };
 
 // Exploration categories (content outside typical tech interests)

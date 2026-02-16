@@ -1,7 +1,133 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getInterests, saveUserInterests, type Interest } from '../services/interestService';
+
+// SVG icon map for each interest
+const INTEREST_ICONS: Record<string, React.ReactNode> = {
+  'Python Programming': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M23.5 6C16.6 6 17 9.1 17 9.1V12.3H24V13.5H12.5S6 12.8 6 20S11.7 27.1 11.7 27.1H14.5V23.8S14.3 18 20.2 18H26.7S32.1 18.1 32.1 12.9V7.7S32.8 6 23.5 6ZM19.7 8.3C20.5 8.3 21.2 9 21.2 9.8C21.2 10.6 20.5 11.3 19.7 11.3C18.9 11.3 18.2 10.6 18.2 9.8C18.2 9 18.9 8.3 19.7 8.3Z"
+        fill="#8B8FA3"
+      />
+      <path
+        d="M24.5 42C31.4 42 31 38.9 31 38.9V35.7H24V34.5H35.5S42 35.2 42 28S36.3 20.9 36.3 20.9H33.5V24.2S33.7 30 27.8 30H21.3S15.9 29.9 15.9 35.1V40.3S15.2 42 24.5 42ZM28.3 39.7C27.5 39.7 26.8 39 26.8 38.2C26.8 37.4 27.5 36.7 28.3 36.7C29.1 36.7 29.8 37.4 29.8 38.2C29.8 39 29.1 39.7 28.3 39.7Z"
+        fill="#8B8FA3"
+      />
+    </svg>
+  ),
+  'Data Science': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="28" width="8" height="12" rx="1" fill="#8B8FA3" />
+      <rect x="20" y="18" width="8" height="22" rx="1" fill="#8B8FA3" />
+      <rect x="32" y="8" width="8" height="32" rx="1" fill="#8B8FA3" />
+      <path
+        d="M10 26L24 14L36 8"
+        stroke="#8B8FA3"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="10" cy="26" r="2" fill="#8B8FA3" />
+      <circle cx="24" cy="14" r="2" fill="#8B8FA3" />
+      <circle cx="36" cy="8" r="2" fill="#8B8FA3" />
+    </svg>
+  ),
+  'UI/UX Design': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="16" stroke="#8B8FA3" strokeWidth="2.5" fill="none" />
+      <circle cx="18" cy="20" r="4" fill="#D4A0A0" />
+      <circle cx="30" cy="18" r="3" fill="#A0C4D4" />
+      <circle cx="26" cy="30" r="5" fill="#A0D4A0" />
+      <circle cx="16" cy="30" r="2.5" fill="#D4D4A0" />
+    </svg>
+  ),
+  'Digital Marketing': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M36 10L36 34L24 28V16L36 10Z" fill="#8B8FA3" />
+      <rect x="12" y="16" width="12" height="12" rx="1" fill="#8B8FA3" />
+      <path d="M16 28V38" stroke="#8B8FA3" strokeWidth="3" strokeLinecap="round" />
+      <path d="M22 28V36" stroke="#8B8FA3" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  ),
+  'Cloud Computing': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M38 28C40.2 28 42 26.2 42 24C42 21.8 40.2 20 38 20H37.2C37.1 15.6 33.5 12 29 12C26.2 12 23.7 13.5 22.3 15.7C21.5 15.3 20.6 15 19.5 15C16.5 15 14 17.5 14 20.5C14 20.7 14 20.9 14 21.1C11.2 21.7 9 24.1 9 27C9 30.3 11.7 33 15 33H38C40.2 33 42 31.2 42 29"
+        stroke="#8B8FA3"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <rect x="18" y="36" width="4" height="2" rx="1" fill="#8B8FA3" />
+      <rect x="25" y="36" width="4" height="2" rx="1" fill="#8B8FA3" />
+      <rect x="18" y="40" width="11" height="2" rx="1" fill="#8B8FA3" />
+    </svg>
+  ),
+  Cybersecurity: (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M24 6L10 12V22C10 32.5 16 39.5 24 42C32 39.5 38 32.5 38 22V12L24 6Z"
+        stroke="#8B8FA3"
+        strokeWidth="2.5"
+        fill="none"
+      />
+      <path d="M24 6L10 12V22C10 32.5 16 39.5 24 42V6Z" fill="#8B8FA3" opacity="0.15" />
+      <path
+        d="M20 24L23 27L28 20"
+        stroke="#8B8FA3"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  'React Framework': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="3.5" fill="#8B8FA3" />
+      <ellipse cx="24" cy="24" rx="18" ry="7" stroke="#8B8FA3" strokeWidth="2" fill="none" />
+      <ellipse
+        cx="24"
+        cy="24"
+        rx="18"
+        ry="7"
+        stroke="#8B8FA3"
+        strokeWidth="2"
+        fill="none"
+        transform="rotate(60 24 24)"
+      />
+      <ellipse
+        cx="24"
+        cy="24"
+        rx="18"
+        ry="7"
+        stroke="#8B8FA3"
+        strokeWidth="2"
+        fill="none"
+        transform="rotate(120 24 24)"
+      />
+    </svg>
+  ),
+  'Personal Finance': (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="24" cy="34" rx="14" ry="4" stroke="#8B8FA3" strokeWidth="2" fill="none" />
+      <ellipse cx="24" cy="28" rx="14" ry="4" stroke="#8B8FA3" strokeWidth="2" fill="none" />
+      <ellipse cx="24" cy="22" rx="14" ry="4" stroke="#8B8FA3" strokeWidth="2" fill="none" />
+      <ellipse
+        cx="24"
+        cy="16"
+        rx="14"
+        ry="4"
+        stroke="#8B8FA3"
+        strokeWidth="2"
+        fill="#8B8FA3"
+        opacity="0.15"
+      />
+      <ellipse cx="24" cy="16" rx="14" ry="4" stroke="#8B8FA3" strokeWidth="2" fill="none" />
+    </svg>
+  ),
+};
 
 export function InterestSelection() {
   const navigate = useNavigate();
@@ -72,26 +198,9 @@ export function InterestSelection() {
     <div className="onboarding-container">
       <div className="onboarding-content">
         <header className="onboarding-header">
-          <div className="onboarding-icon">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path d="M24 4L2 16L24 28L42 18.18V32H46V16L24 4Z" fill="#5b5fc7" />
-              <path
-                d="M10 21.18V33.18L24 42L38 33.18V21.18L24 30L10 21.18Z"
-                fill="#5b5fc7"
-                opacity="0.8"
-              />
-            </svg>
-          </div>
-          <h1 className="onboarding-title">Choose what you want to learn</h1>
+          <h1 className="onboarding-title">What do you want to learn?</h1>
           <p className="onboarding-subtitle">
-            Pick at least one interest to personalize your experience.
+            Select one or more topics to personalize your home feed.
           </p>
         </header>
 
@@ -108,20 +217,53 @@ export function InterestSelection() {
           </div>
         )}
 
-        <div className="interests-grid" role="group" aria-label="Learning interests">
-          {interests.map((interest) => (
-            <button
-              key={interest.id}
-              type="button"
-              className={`interest-chip ${selectedIds.has(interest.id) ? 'selected' : ''}`}
-              onClick={() => toggleInterest(interest.id)}
-              aria-pressed={selectedIds.has(interest.id)}
-              disabled={isSaving}
-            >
-              <span className="interest-chip-icon">{selectedIds.has(interest.id) ? '✓' : '+'}</span>
-              <span className="interest-chip-text">{interest.name}</span>
-            </button>
-          ))}
+        <div className="interest-cards-grid" role="group" aria-label="Learning interests">
+          {interests.map((interest) => {
+            const isSelected = selectedIds.has(interest.id);
+            return (
+              <button
+                key={interest.id}
+                type="button"
+                className={`interest-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => toggleInterest(interest.id)}
+                aria-pressed={isSelected}
+                disabled={isSaving}
+              >
+                <span className={`interest-card-radio ${isSelected ? 'checked' : ''}`}>
+                  {isSelected && (
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <circle cx="5" cy="5" r="5" fill="#5b5fc7" />
+                    </svg>
+                  )}
+                </span>
+                <span className="interest-card-icon">
+                  {INTEREST_ICONS[interest.name] || (
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                      <circle
+                        cx="24"
+                        cy="24"
+                        r="16"
+                        stroke="#8B8FA3"
+                        strokeWidth="2.5"
+                        fill="none"
+                      />
+                      <text
+                        x="24"
+                        y="29"
+                        textAnchor="middle"
+                        fill="#8B8FA3"
+                        fontSize="16"
+                        fontWeight="600"
+                      >
+                        ?
+                      </text>
+                    </svg>
+                  )}
+                </span>
+                <span className="interest-card-name">{interest.name}</span>
+              </button>
+            );
+          })}
         </div>
 
         {interests.length === 0 && !error && (
@@ -144,7 +286,7 @@ export function InterestSelection() {
               Saving...
             </>
           ) : (
-            `Continue${selectedIds.size > 0 ? ` (${selectedIds.size} selected)` : ''}`
+            'Continue'
           )}
         </button>
         {selectedIds.size === 0 && (
