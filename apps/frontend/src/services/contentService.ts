@@ -196,6 +196,7 @@ export function getFirstUnfinishedEpisode(
 ): { episodeId: string; episodeTitle: string; order: number } | null {
   const series = SERIES_DATA.find((s) => s.id === seriesId);
   if (!series) return null;
+  if (!series.episodes || series.episodes.length === 0) return null;
 
   const progress = getSeriesProgress(seriesId);
   const sorted = [...series.episodes].sort((a, b) => a.order - b.order);

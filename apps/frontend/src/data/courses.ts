@@ -212,7 +212,7 @@ export const SERIES_DATA: Series[] = [
     thumbnail: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=400&h=225&fit=crop',
     description: 'Understand threats, vulnerabilities, and defense strategies.',
     tags: ['Cybersecurity'],
-    category: 'Cloud Computing',
+    category: 'Cybersecurity',
     episodes: [
       { id: 'ep-s1', title: 'Threat Landscape', duration: 2200, order: 1 },
       { id: 'ep-s2', title: 'Network Security', duration: 2600, order: 2 },
@@ -268,7 +268,7 @@ export const INTEREST_CATEGORY_MAP: Record<string, string[]> = {
   'UI/UX Design': ['Design'],
   'Digital Marketing': ['Marketing'],
   'Cloud Computing': ['Cloud Computing'],
-  Cybersecurity: ['Cloud Computing', 'DevOps'],
+  Cybersecurity: ['Cybersecurity'],
   'React Framework': ['Web Development'],
   'Personal Finance': ['Finance'],
 };

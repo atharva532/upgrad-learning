@@ -3,7 +3,6 @@
  * Displays a series thumbnail, title, episode count, and overall progress
  */
 
-import { useMemo } from 'react';
 import { Series } from '../../types/content.types';
 import { getSeriesProgressPercent } from '../../services/contentService';
 
@@ -23,7 +22,7 @@ function formatTotalDuration(episodes: Series['episodes']): string {
 }
 
 export function SeriesCard({ series, onSeriesClick }: SeriesCardProps) {
-  const progressPercent = useMemo(() => getSeriesProgressPercent(series.id), [series.id]);
+  const progressPercent = getSeriesProgressPercent(series.id);
 
   return (
     <div
