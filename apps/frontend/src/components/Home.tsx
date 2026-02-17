@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Video } from '../types/content.types';
+import { Video, Series } from '../types/content.types';
 import {
   getContinueWatching,
-  getRecommendations,
+  getRecommendedSeries,
   getExplorationContent,
   saveWatchProgress,
+  getFirstUnfinishedEpisode,
 } from '../services/contentService';
+import { getUserInterests } from '../services/interestService';
 import { ContinueWatching, RecommendationsSection, ExplorationSection } from './homepage';
 
 export function Home() {
@@ -16,7 +18,7 @@ export function Home() {
 
   // State for homepage sections
   const [continueVideo, setContinueVideo] = useState<Video | null>(null);
-  const [recommendations, setRecommendations] = useState<Video[]>([]);
+  const [recommendations, setRecommendations] = useState<Series[]>([]);
   const [exploration, setExploration] = useState<Video[]>([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
   const [isLoadingExploration, setIsLoadingExploration] = useState(true);
@@ -28,8 +30,15 @@ export function Home() {
         const continueWatching = await getContinueWatching();
         setContinueVideo(continueWatching);
 
-        // Load recommendations (would use user interests in production)
-        const recs = await getRecommendations([]);
+        // Load user interests and get personalized series recommendations
+        let interestNames: string[] = [];
+        try {
+          const interests = await getUserInterests();
+          interestNames = interests.map((i) => i.name);
+        } catch {
+          console.warn('Could not fetch user interests, using defaults');
+        }
+        const recs = await getRecommendedSeries(interestNames);
         setRecommendations(recs);
         setIsLoadingRecommendations(false);
 
@@ -59,6 +68,17 @@ export function Home() {
     saveWatchProgress(videoId, Math.min(100, (continueVideo?.progress || 0) + 10));
     // Refresh continue watching to update UI
     getContinueWatching().then(setContinueVideo);
+  };
+
+  const handleSeriesClick = (seriesId: string) => {
+    const episode = getFirstUnfinishedEpisode(seriesId);
+    if (episode) {
+      // In production, navigate to video player with series context
+      console.log(
+        `Starting series ${seriesId} at episode ${episode.order}: ${episode.episodeTitle}`
+      );
+      navigate(`/series/${seriesId}/episode/${episode.episodeId}`);
+    }
   };
 
   const handleWatch = (videoId: string) => {
@@ -115,9 +135,9 @@ export function Home() {
         <ContinueWatching video={continueVideo} onResume={handleResume} />
 
         <RecommendationsSection
-          videos={recommendations}
+          series={recommendations}
           isLoading={isLoadingRecommendations}
-          onWatch={handleWatch}
+          onSeriesClick={handleSeriesClick}
         />
 
         <ExplorationSection

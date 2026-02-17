@@ -1,13 +1,14 @@
 /**
  * Content Service
- * Fetches video content for homepage sections using static course data
+ * Fetches video and series content for homepage sections using static course data
  */
 
-import { Video, WatchProgress } from '../types/content.types';
-import { COURSES, INTEREST_CATEGORY_MAP, EXPLORATION_CATEGORIES } from '../data/courses';
+import { Video, WatchProgress, Series, SeriesProgressMap } from '../types/content.types';
+import { COURSES, SERIES_DATA, EXPLORATION_CATEGORIES } from '../data/courses';
 
 const CONTINUE_WATCHING_KEY = 'continueWatching';
 const WATCH_HISTORY_KEY = 'watchHistory';
+const SERIES_PROGRESS_PREFIX = 'seriesProgress_';
 
 export interface WatchHistoryEntry {
   courseId: string;
@@ -107,37 +108,6 @@ export function clearContinueWatching(): void {
 }
 
 /**
- * Get interest-based recommendations
- * Maps user interests to relevant courses
- */
-export async function getRecommendations(interestIds: string[]): Promise<Video[]> {
-  try {
-    // Get categories for user interests
-    const categories = new Set<string>();
-    interestIds.forEach((id) => {
-      const cats = INTEREST_CATEGORY_MAP[id] || [];
-      cats.forEach((cat) => categories.add(cat));
-    });
-
-    // If no interests, return first 6 courses (excluding exploration)
-    if (categories.size === 0) {
-      return COURSES.filter((c) => !EXPLORATION_CATEGORIES.includes(c.category)).slice(0, 6);
-    }
-
-    // Filter courses by matching categories
-    const matchingCourses = COURSES.filter(
-      (c) => categories.has(c.category) && !EXPLORATION_CATEGORIES.includes(c.category)
-    );
-
-    // Shuffle and return up to 8
-    return shuffleArray(matchingCourses).slice(0, 8);
-  } catch (error) {
-    console.error('Error fetching recommendations:', error);
-    return [];
-  }
-}
-
-/**
  * Get exploration content (outside user interests)
  * Returns content from different categories to encourage discovery
  */
@@ -177,4 +147,112 @@ function shuffleArray<T>(array: T[]): T[] {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+// ========== Series Recommendation Functions ==========
+
+/**
+ * Get series progress from localStorage
+ */
+function getSeriesProgress(seriesId: string): SeriesProgressMap {
+  try {
+    const saved = localStorage.getItem(`${SERIES_PROGRESS_PREFIX}${seriesId}`);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Save progress for a specific episode within a series
+ */
+export function saveSeriesEpisodeProgress(
+  seriesId: string,
+  episodeId: string,
+  progress: number
+): void {
+  const current = getSeriesProgress(seriesId);
+  current[episodeId] = Math.min(100, Math.max(0, progress));
+  localStorage.setItem(`${SERIES_PROGRESS_PREFIX}${seriesId}`, JSON.stringify(current));
+}
+
+/**
+ * Check if all episodes in a series are completed (progress >= 100)
+ */
+export function isSeriesCompleted(seriesId: string): boolean {
+  const series = SERIES_DATA.find((s) => s.id === seriesId);
+  if (!series) return false;
+
+  const progress = getSeriesProgress(seriesId);
+  return series.episodes.every((ep) => (progress[ep.id] || 0) >= 100);
+}
+
+/**
+ * Get the first unfinished episode in a series (linear enforcement)
+ * Returns the first episode with progress < 100, or the first episode if none started
+ */
+export function getFirstUnfinishedEpisode(
+  seriesId: string
+): { episodeId: string; episodeTitle: string; order: number } | null {
+  const series = SERIES_DATA.find((s) => s.id === seriesId);
+  if (!series) return null;
+  if (!series.episodes || series.episodes.length === 0) return null;
+
+  const progress = getSeriesProgress(seriesId);
+  const sorted = [...series.episodes].sort((a, b) => a.order - b.order);
+
+  const unfinished = sorted.find((ep) => (progress[ep.id] || 0) < 100);
+
+  if (unfinished) {
+    return {
+      episodeId: unfinished.id,
+      episodeTitle: unfinished.title,
+      order: unfinished.order,
+    };
+  }
+
+  // All completed, return first episode
+  return {
+    episodeId: sorted[0].id,
+    episodeTitle: sorted[0].title,
+    order: sorted[0].order,
+  };
+}
+
+/**
+ * Get overall progress percentage for a series
+ */
+export function getSeriesProgressPercent(seriesId: string): number {
+  const series = SERIES_DATA.find((s) => s.id === seriesId);
+  if (!series || series.episodes.length === 0) return 0;
+
+  const progress = getSeriesProgress(seriesId);
+  const totalProgress = series.episodes.reduce((sum, ep) => sum + (progress[ep.id] || 0), 0);
+
+  return Math.round(totalProgress / series.episodes.length);
+}
+
+/**
+ * Get interest-based series recommendations
+ * Filters SERIES_DATA by matching interest tags, excludes completed series
+ */
+export async function getRecommendedSeries(interestNames: string[]): Promise<Series[]> {
+  try {
+    // If no interests, return first 6 series
+    if (interestNames.length === 0) {
+      return SERIES_DATA.filter((s) => !isSeriesCompleted(s.id)).slice(0, 6);
+    }
+
+    // Filter series where any tag matches any interest
+    const interestSet = new Set(interestNames);
+    const matchingSeries = SERIES_DATA.filter(
+      (s) => s.tags.some((tag) => interestSet.has(tag)) && !isSeriesCompleted(s.id)
+    );
+
+    // Shuffle and return up to 8
+    return shuffleArray(matchingSeries).slice(0, 8);
+  } catch (error) {
+    console.error('Error fetching recommended series:', error);
+    return [];
+  }
 }

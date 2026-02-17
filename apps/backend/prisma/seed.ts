@@ -3,16 +3,14 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const interests = [
-  'Web Development',
+  'Python Programming',
   'Data Science',
-  'Artificial Intelligence',
-  'Machine Learning',
-  'Cloud Computing',
-  'Mobile Development',
-  'Cybersecurity',
-  'DevOps',
   'UI/UX Design',
-  'Blockchain',
+  'Digital Marketing',
+  'Cloud Computing',
+  'Cybersecurity',
+  'React Framework',
+  'Personal Finance',
 ];
 
 async function main() {

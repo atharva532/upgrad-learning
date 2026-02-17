@@ -3,7 +3,7 @@
  * Realistic mock courses for the learning platform
  */
 
-import { Video } from '../types/content.types';
+import { Video, Series } from '../types/content.types';
 
 export const COURSES: Video[] = [
   // Web Development
@@ -147,18 +147,130 @@ export const COURSES: Video[] = [
   },
 ];
 
-// Map interests to course categories
+// Series data with interest tags for recommendations
+export const SERIES_DATA: Series[] = [
+  {
+    id: 'series-react',
+    title: 'React Mastery',
+    thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=225&fit=crop',
+    description: 'Master React from components to advanced patterns.',
+    tags: ['React Framework'],
+    category: 'Web Development',
+    episodes: [
+      { id: 'ep-r1', title: 'JSX & Components', duration: 2400, order: 1 },
+      { id: 'ep-r2', title: 'State & Props', duration: 2700, order: 2 },
+      { id: 'ep-r3', title: 'Hooks Deep Dive', duration: 3000, order: 3 },
+      { id: 'ep-r4', title: 'Context & Reducers', duration: 2800, order: 4 },
+    ],
+  },
+  {
+    id: 'series-python',
+    title: 'Python for Data Analysis',
+    thumbnail: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=400&h=225&fit=crop',
+    description: 'Learn Python fundamentals with a focus on data analysis libraries.',
+    tags: ['Python Programming', 'Data Science'],
+    category: 'Data Science',
+    episodes: [
+      { id: 'ep-p1', title: 'Python Basics', duration: 2400, order: 1 },
+      { id: 'ep-p2', title: 'NumPy Essentials', duration: 2600, order: 2 },
+      { id: 'ep-p3', title: 'Pandas DataFrames', duration: 3200, order: 3 },
+      { id: 'ep-p4', title: 'Data Visualization with Matplotlib', duration: 2800, order: 4 },
+      { id: 'ep-p5', title: 'Real-World Analysis Project', duration: 3600, order: 5 },
+    ],
+  },
+  {
+    id: 'series-ds',
+    title: 'Data Science Foundations',
+    thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=225&fit=crop',
+    description: 'Build a strong foundation in statistics and machine learning concepts.',
+    tags: ['Data Science'],
+    category: 'Data Science',
+    episodes: [
+      { id: 'ep-ds1', title: 'Descriptive Statistics', duration: 2200, order: 1 },
+      { id: 'ep-ds2', title: 'Probability & Distributions', duration: 2800, order: 2 },
+      { id: 'ep-ds3', title: 'Hypothesis Testing', duration: 2600, order: 3 },
+      { id: 'ep-ds4', title: 'Regression Models', duration: 3000, order: 4 },
+    ],
+  },
+  {
+    id: 'series-cloud',
+    title: 'Cloud Infrastructure Essentials',
+    thumbnail: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=225&fit=crop',
+    description: 'Deploy and manage cloud infrastructure with AWS fundamentals.',
+    tags: ['Cloud Computing'],
+    category: 'Cloud Computing',
+    episodes: [
+      { id: 'ep-c1', title: 'Cloud Concepts & AWS Intro', duration: 2000, order: 1 },
+      { id: 'ep-c2', title: 'EC2 & Networking', duration: 2800, order: 2 },
+      { id: 'ep-c3', title: 'S3 & Storage Solutions', duration: 2400, order: 3 },
+      { id: 'ep-c4', title: 'IAM & Security', duration: 2600, order: 4 },
+    ],
+  },
+  {
+    id: 'series-security',
+    title: 'Cybersecurity Fundamentals',
+    thumbnail: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=400&h=225&fit=crop',
+    description: 'Understand threats, vulnerabilities, and defense strategies.',
+    tags: ['Cybersecurity'],
+    category: 'Cybersecurity',
+    episodes: [
+      { id: 'ep-s1', title: 'Threat Landscape', duration: 2200, order: 1 },
+      { id: 'ep-s2', title: 'Network Security', duration: 2600, order: 2 },
+      { id: 'ep-s3', title: 'Encryption & PKI', duration: 3000, order: 3 },
+    ],
+  },
+  {
+    id: 'series-uiux',
+    title: 'UI/UX Design Principles',
+    thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=225&fit=crop',
+    description: 'Design user-centered interfaces with modern UX methodologies.',
+    tags: ['UI/UX Design'],
+    category: 'Design',
+    episodes: [
+      { id: 'ep-u1', title: 'Design Thinking', duration: 2000, order: 1 },
+      { id: 'ep-u2', title: 'Wireframing & Prototyping', duration: 2400, order: 2 },
+      { id: 'ep-u3', title: 'Color Theory & Typography', duration: 2200, order: 3 },
+      { id: 'ep-u4', title: 'Usability Testing', duration: 2600, order: 4 },
+    ],
+  },
+  {
+    id: 'series-marketing',
+    title: 'Digital Marketing Strategy',
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=225&fit=crop',
+    description: 'Plan and execute digital campaigns across channels.',
+    tags: ['Digital Marketing'],
+    category: 'Marketing',
+    episodes: [
+      { id: 'ep-m1', title: 'Marketing Fundamentals', duration: 2000, order: 1 },
+      { id: 'ep-m2', title: 'SEO & Content Strategy', duration: 2600, order: 2 },
+      { id: 'ep-m3', title: 'Social Media Marketing', duration: 2400, order: 3 },
+    ],
+  },
+  {
+    id: 'series-finance',
+    title: 'Personal Finance Mastery',
+    thumbnail: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=225&fit=crop',
+    description: 'Take control of your finances with budgeting, investing, and planning.',
+    tags: ['Personal Finance'],
+    category: 'Finance',
+    episodes: [
+      { id: 'ep-f1', title: 'Budgeting Basics', duration: 1800, order: 1 },
+      { id: 'ep-f2', title: 'Investing Fundamentals', duration: 2400, order: 2 },
+      { id: 'ep-f3', title: 'Retirement Planning', duration: 2200, order: 3 },
+    ],
+  },
+];
+
+// Map interest names (as stored in DB) to course categories
 export const INTEREST_CATEGORY_MAP: Record<string, string[]> = {
-  'web-dev': ['Web Development'],
-  'data-science': ['Data Science'],
-  'ai-ml': ['Artificial Intelligence'],
-  'mobile-dev': ['Mobile Development'],
-  'ui-ux': ['Design'],
-  cloud: ['Cloud Computing'],
-  devops: ['DevOps'],
-  cybersecurity: ['Cloud Computing', 'DevOps'],
-  blockchain: ['Web Development'],
-  iot: ['Mobile Development', 'Cloud Computing'],
+  'Python Programming': ['Data Science', 'Artificial Intelligence'],
+  'Data Science': ['Data Science'],
+  'UI/UX Design': ['Design'],
+  'Digital Marketing': ['Marketing'],
+  'Cloud Computing': ['Cloud Computing'],
+  Cybersecurity: ['Cybersecurity'],
+  'React Framework': ['Web Development'],
+  'Personal Finance': ['Finance'],
 };
 
 // Exploration categories (content outside typical tech interests)

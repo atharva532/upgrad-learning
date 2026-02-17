@@ -24,23 +24,35 @@ vi.mock('../context/AuthContext', () => ({
   }),
 }));
 
+// Mock the interest service
+vi.mock('../services/interestService', () => ({
+  getUserInterests: vi.fn().mockResolvedValue([{ id: '1', name: 'Web Development' }]),
+}));
+
 // Mock the content service
 vi.mock('../services/contentService', () => ({
   getContinueWatching: vi.fn().mockResolvedValue(null),
-  getRecommendations: vi.fn().mockResolvedValue([
+  getRecommendedSeries: vi.fn().mockResolvedValue([
     {
-      id: '1',
-      title: 'Test Video 1',
+      id: 'series-1',
+      title: 'Test Series 1',
       thumbnail: 'thumb1.jpg',
-      duration: 1200,
+      description: 'A test series',
+      tags: ['Web Development'],
       category: 'Web Dev',
+      episodes: [
+        { id: 'ep-1', title: 'Episode 1', duration: 1200, order: 1 },
+        { id: 'ep-2', title: 'Episode 2', duration: 1800, order: 2 },
+      ],
     },
     {
-      id: '2',
-      title: 'Test Video 2',
+      id: 'series-2',
+      title: 'Test Series 2',
       thumbnail: 'thumb2.jpg',
-      duration: 1800,
+      description: 'Another test series',
+      tags: ['Data Science'],
       category: 'Data Science',
+      episodes: [{ id: 'ep-3', title: 'Episode 1', duration: 1200, order: 1 }],
     },
   ]),
   getExplorationContent: vi.fn().mockResolvedValue([
@@ -53,6 +65,12 @@ vi.mock('../services/contentService', () => ({
     },
   ]),
   saveWatchProgress: vi.fn(),
+  getFirstUnfinishedEpisode: vi.fn().mockReturnValue({
+    episodeId: 'ep-1',
+    episodeTitle: 'Episode 1',
+    order: 1,
+  }),
+  getSeriesProgressPercent: vi.fn().mockReturnValue(0),
 }));
 
 describe('Home Component', () => {

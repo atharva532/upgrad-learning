@@ -1,21 +1,21 @@
 /**
  * RecommendationsSection Component
- * Interest-based video recommendations
+ * Interest-based series recommendations
  */
 
-import { Video } from '../../types/content.types';
-import { VideoCard } from './VideoCard';
+import { Series } from '../../types/content.types';
+import { SeriesCard } from './SeriesCard';
 
 interface RecommendationsSectionProps {
-  videos: Video[];
+  series: Series[];
   isLoading: boolean;
-  onWatch: (videoId: string) => void;
+  onSeriesClick: (seriesId: string) => void;
 }
 
 export function RecommendationsSection({
-  videos,
+  series,
   isLoading,
-  onWatch,
+  onSeriesClick,
 }: RecommendationsSectionProps) {
   if (isLoading) {
     return (
@@ -34,7 +34,7 @@ export function RecommendationsSection({
     );
   }
 
-  if (videos.length === 0) {
+  if (series.length === 0) {
     return (
       <section className="homepage-section recommendations-section">
         <h2 className="section-title">Recommended for You</h2>
@@ -48,13 +48,8 @@ export function RecommendationsSection({
       <h2 className="section-title">Recommended for You</h2>
       <p className="section-subtitle">Based on your interests</p>
       <div className="video-grid">
-        {videos.map((video) => (
-          <VideoCard
-            key={video.id}
-            video={video}
-            onAction={() => onWatch(video.id)}
-            actionLabel="Watch"
-          />
+        {series.map((s) => (
+          <SeriesCard key={s.id} series={s} onSeriesClick={onSeriesClick} />
         ))}
       </div>
     </section>

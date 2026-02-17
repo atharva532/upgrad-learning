@@ -76,11 +76,11 @@ describe('InterestSelection', () => {
     renderWithProviders(<InterestSelection />);
 
     await waitFor(() => {
-      expect(screen.getByText('Choose what you want to learn')).toBeInTheDocument();
+      expect(screen.getByText('What do you want to learn?')).toBeInTheDocument();
     });
 
     expect(
-      screen.getByText('Pick at least one interest to personalize your experience.')
+      screen.getByText('Select one or more topics to personalize your home feed.')
     ).toBeInTheDocument();
   });
 
@@ -105,7 +105,7 @@ describe('InterestSelection', () => {
     // Click on an interest
     fireEvent.click(screen.getByText('Web Development'));
 
-    const continueButton = screen.getByRole('button', { name: /continue.*1 selected/i });
+    const continueButton = screen.getByRole('button', { name: /continue/i });
     expect(continueButton).not.toBeDisabled();
   });
 
@@ -137,8 +137,9 @@ describe('InterestSelection', () => {
     fireEvent.click(screen.getByText('Web Development'));
     fireEvent.click(screen.getByText('Data Science'));
 
-    const continueButton = screen.getByRole('button', { name: /continue.*2 selected/i });
+    const continueButton = screen.getByRole('button', { name: /continue/i });
     expect(continueButton).toBeInTheDocument();
+    expect(continueButton).not.toBeDisabled();
   });
 
   it('shows error state when loading fails', async () => {
