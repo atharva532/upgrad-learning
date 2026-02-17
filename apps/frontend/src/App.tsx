@@ -7,6 +7,7 @@ import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { InterestSelection } from './pages/InterestSelection';
 import { Home } from './components/Home';
+import { PlayerPage } from './pages/PlayerPage';
 
 function App() {
   return (
@@ -42,6 +43,26 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Video Player - standalone course */}
+          <Route
+            path="/watch/:videoId"
+            element={
+              <ProtectedRoute>
+                <PlayerPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Video Player - series episode */}
+          <Route
+            path="/series/:seriesId/episode/:episodeId"
+            element={
+              <ProtectedRoute>
+                <PlayerPage />
               </ProtectedRoute>
             }
           />

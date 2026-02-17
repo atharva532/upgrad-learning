@@ -1,9 +1,29 @@
 /**
  * Static Course Data
  * Realistic mock courses for the learning platform
+ * Includes videoUrl for fallback when API is unavailable
  */
 
 import { Video, Series } from '../types/content.types';
+
+// Open-source sample video URLs (Creative Commons / Public Domain)
+const VIDEOS = {
+  bigBuckBunny:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+  elephantsDream:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+  sintel: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+  tearsOfSteel:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+  forBiggerBlazes:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+  forBiggerEscapes:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  forBiggerFun:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+  forBiggerJoyrides:
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+};
 
 export const COURSES: Video[] = [
   // Web Development
@@ -14,6 +34,7 @@ export const COURSES: Video[] = [
     duration: 7200,
     category: 'Web Development',
     description: 'Learn the fundamentals of HTML, CSS, and JavaScript to build modern websites.',
+    videoUrl: VIDEOS.bigBuckBunny,
   },
   {
     id: 'course-2',
@@ -22,6 +43,7 @@ export const COURSES: Video[] = [
     duration: 5400,
     category: 'Web Development',
     description: 'Master React.js from scratch. Build interactive user interfaces with components.',
+    videoUrl: VIDEOS.sintel,
   },
   {
     id: 'course-3',
@@ -30,6 +52,7 @@ export const COURSES: Video[] = [
     duration: 4800,
     category: 'Web Development',
     description: 'Add type safety to your JavaScript projects with TypeScript.',
+    videoUrl: VIDEOS.elephantsDream,
   },
   {
     id: 'course-4',
@@ -38,6 +61,7 @@ export const COURSES: Video[] = [
     duration: 6000,
     category: 'Web Development',
     description: 'Build scalable server-side applications with Node.js and Express.',
+    videoUrl: VIDEOS.tearsOfSteel,
   },
 
   // Data Science
@@ -48,6 +72,7 @@ export const COURSES: Video[] = [
     duration: 8400,
     category: 'Data Science',
     description: 'Learn Python programming with focus on data analysis and visualization.',
+    videoUrl: VIDEOS.bigBuckBunny,
   },
   {
     id: 'course-6',
@@ -56,6 +81,7 @@ export const COURSES: Video[] = [
     duration: 9600,
     category: 'Artificial Intelligence',
     description: 'Introduction to machine learning algorithms and their applications.',
+    videoUrl: VIDEOS.sintel,
   },
   {
     id: 'course-7',
@@ -64,6 +90,7 @@ export const COURSES: Video[] = [
     duration: 5400,
     category: 'Data Science',
     description: 'Master SQL queries and learn to design efficient database schemas.',
+    videoUrl: VIDEOS.elephantsDream,
   },
 
   // Mobile Development
@@ -74,6 +101,7 @@ export const COURSES: Video[] = [
     duration: 7200,
     category: 'Mobile Development',
     description: 'Build cross-platform mobile applications with React Native.',
+    videoUrl: VIDEOS.tearsOfSteel,
   },
   {
     id: 'course-9',
@@ -82,6 +110,7 @@ export const COURSES: Video[] = [
     duration: 10800,
     category: 'Mobile Development',
     description: 'Create beautiful iOS applications using Swift and SwiftUI.',
+    videoUrl: VIDEOS.bigBuckBunny,
   },
 
   // Design
@@ -92,6 +121,7 @@ export const COURSES: Video[] = [
     duration: 6600,
     category: 'Design',
     description: 'Learn the principles of user interface and user experience design.',
+    videoUrl: VIDEOS.elephantsDream,
   },
   {
     id: 'course-11',
@@ -100,6 +130,7 @@ export const COURSES: Video[] = [
     duration: 4800,
     category: 'Design',
     description: 'Master Figma to create stunning designs and prototypes.',
+    videoUrl: VIDEOS.sintel,
   },
 
   // Cloud & DevOps
@@ -110,6 +141,7 @@ export const COURSES: Video[] = [
     duration: 7800,
     category: 'Cloud Computing',
     description: 'Get started with Amazon Web Services cloud platform.',
+    videoUrl: VIDEOS.tearsOfSteel,
   },
   {
     id: 'course-13',
@@ -118,6 +150,7 @@ export const COURSES: Video[] = [
     duration: 6000,
     category: 'DevOps',
     description: 'Learn containerization with Docker and orchestration with Kubernetes.',
+    videoUrl: VIDEOS.bigBuckBunny,
   },
 
   // Exploration Content
@@ -128,6 +161,7 @@ export const COURSES: Video[] = [
     duration: 4200,
     category: 'Marketing',
     description: 'Learn SEO, social media marketing, and content strategy.',
+    videoUrl: VIDEOS.elephantsDream,
   },
   {
     id: 'course-15',
@@ -136,6 +170,7 @@ export const COURSES: Video[] = [
     duration: 3600,
     category: 'Finance',
     description: 'Understand personal finance, investing, and wealth building.',
+    videoUrl: VIDEOS.sintel,
   },
   {
     id: 'course-16',
@@ -144,6 +179,7 @@ export const COURSES: Video[] = [
     duration: 3000,
     category: 'Communication',
     description: 'Overcome stage fright and deliver impactful presentations.',
+    videoUrl: VIDEOS.tearsOfSteel,
   },
 ];
 
@@ -157,10 +193,38 @@ export const SERIES_DATA: Series[] = [
     tags: ['React Framework'],
     category: 'Web Development',
     episodes: [
-      { id: 'ep-r1', title: 'JSX & Components', duration: 2400, order: 1 },
-      { id: 'ep-r2', title: 'State & Props', duration: 2700, order: 2 },
-      { id: 'ep-r3', title: 'Hooks Deep Dive', duration: 3000, order: 3 },
-      { id: 'ep-r4', title: 'Context & Reducers', duration: 2800, order: 4 },
+      {
+        id: 'ep-r1',
+        title: 'JSX & Components',
+        duration: 2400,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-react',
+      },
+      {
+        id: 'ep-r2',
+        title: 'State & Props',
+        duration: 2700,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-react',
+      },
+      {
+        id: 'ep-r3',
+        title: 'Hooks Deep Dive',
+        duration: 3000,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-react',
+      },
+      {
+        id: 'ep-r4',
+        title: 'Context & Reducers',
+        duration: 2800,
+        order: 4,
+        videoUrl: VIDEOS.forBiggerJoyrides,
+        seriesId: 'series-react',
+      },
     ],
   },
   {
@@ -171,11 +235,46 @@ export const SERIES_DATA: Series[] = [
     tags: ['Python Programming', 'Data Science'],
     category: 'Data Science',
     episodes: [
-      { id: 'ep-p1', title: 'Python Basics', duration: 2400, order: 1 },
-      { id: 'ep-p2', title: 'NumPy Essentials', duration: 2600, order: 2 },
-      { id: 'ep-p3', title: 'Pandas DataFrames', duration: 3200, order: 3 },
-      { id: 'ep-p4', title: 'Data Visualization with Matplotlib', duration: 2800, order: 4 },
-      { id: 'ep-p5', title: 'Real-World Analysis Project', duration: 3600, order: 5 },
+      {
+        id: 'ep-p1',
+        title: 'Python Basics',
+        duration: 2400,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-python',
+      },
+      {
+        id: 'ep-p2',
+        title: 'NumPy Essentials',
+        duration: 2600,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-python',
+      },
+      {
+        id: 'ep-p3',
+        title: 'Pandas DataFrames',
+        duration: 3200,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-python',
+      },
+      {
+        id: 'ep-p4',
+        title: 'Data Visualization with Matplotlib',
+        duration: 2800,
+        order: 4,
+        videoUrl: VIDEOS.forBiggerJoyrides,
+        seriesId: 'series-python',
+      },
+      {
+        id: 'ep-p5',
+        title: 'Real-World Analysis Project',
+        duration: 3600,
+        order: 5,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-python',
+      },
     ],
   },
   {
@@ -186,10 +285,38 @@ export const SERIES_DATA: Series[] = [
     tags: ['Data Science'],
     category: 'Data Science',
     episodes: [
-      { id: 'ep-ds1', title: 'Descriptive Statistics', duration: 2200, order: 1 },
-      { id: 'ep-ds2', title: 'Probability & Distributions', duration: 2800, order: 2 },
-      { id: 'ep-ds3', title: 'Hypothesis Testing', duration: 2600, order: 3 },
-      { id: 'ep-ds4', title: 'Regression Models', duration: 3000, order: 4 },
+      {
+        id: 'ep-ds1',
+        title: 'Descriptive Statistics',
+        duration: 2200,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-ds',
+      },
+      {
+        id: 'ep-ds2',
+        title: 'Probability & Distributions',
+        duration: 2800,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-ds',
+      },
+      {
+        id: 'ep-ds3',
+        title: 'Hypothesis Testing',
+        duration: 2600,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerJoyrides,
+        seriesId: 'series-ds',
+      },
+      {
+        id: 'ep-ds4',
+        title: 'Regression Models',
+        duration: 3000,
+        order: 4,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-ds',
+      },
     ],
   },
   {
@@ -200,10 +327,38 @@ export const SERIES_DATA: Series[] = [
     tags: ['Cloud Computing'],
     category: 'Cloud Computing',
     episodes: [
-      { id: 'ep-c1', title: 'Cloud Concepts & AWS Intro', duration: 2000, order: 1 },
-      { id: 'ep-c2', title: 'EC2 & Networking', duration: 2800, order: 2 },
-      { id: 'ep-c3', title: 'S3 & Storage Solutions', duration: 2400, order: 3 },
-      { id: 'ep-c4', title: 'IAM & Security', duration: 2600, order: 4 },
+      {
+        id: 'ep-c1',
+        title: 'Cloud Concepts & AWS Intro',
+        duration: 2000,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-cloud',
+      },
+      {
+        id: 'ep-c2',
+        title: 'EC2 & Networking',
+        duration: 2800,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-cloud',
+      },
+      {
+        id: 'ep-c3',
+        title: 'S3 & Storage Solutions',
+        duration: 2400,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-cloud',
+      },
+      {
+        id: 'ep-c4',
+        title: 'IAM & Security',
+        duration: 2600,
+        order: 4,
+        videoUrl: VIDEOS.forBiggerJoyrides,
+        seriesId: 'series-cloud',
+      },
     ],
   },
   {
@@ -214,9 +369,30 @@ export const SERIES_DATA: Series[] = [
     tags: ['Cybersecurity'],
     category: 'Cybersecurity',
     episodes: [
-      { id: 'ep-s1', title: 'Threat Landscape', duration: 2200, order: 1 },
-      { id: 'ep-s2', title: 'Network Security', duration: 2600, order: 2 },
-      { id: 'ep-s3', title: 'Encryption & PKI', duration: 3000, order: 3 },
+      {
+        id: 'ep-s1',
+        title: 'Threat Landscape',
+        duration: 2200,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-security',
+      },
+      {
+        id: 'ep-s2',
+        title: 'Network Security',
+        duration: 2600,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-security',
+      },
+      {
+        id: 'ep-s3',
+        title: 'Encryption & PKI',
+        duration: 3000,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-security',
+      },
     ],
   },
   {
@@ -227,10 +403,38 @@ export const SERIES_DATA: Series[] = [
     tags: ['UI/UX Design'],
     category: 'Design',
     episodes: [
-      { id: 'ep-u1', title: 'Design Thinking', duration: 2000, order: 1 },
-      { id: 'ep-u2', title: 'Wireframing & Prototyping', duration: 2400, order: 2 },
-      { id: 'ep-u3', title: 'Color Theory & Typography', duration: 2200, order: 3 },
-      { id: 'ep-u4', title: 'Usability Testing', duration: 2600, order: 4 },
+      {
+        id: 'ep-u1',
+        title: 'Design Thinking',
+        duration: 2000,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerJoyrides,
+        seriesId: 'series-uiux',
+      },
+      {
+        id: 'ep-u2',
+        title: 'Wireframing & Prototyping',
+        duration: 2400,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-uiux',
+      },
+      {
+        id: 'ep-u3',
+        title: 'Color Theory & Typography',
+        duration: 2200,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-uiux',
+      },
+      {
+        id: 'ep-u4',
+        title: 'Usability Testing',
+        duration: 2600,
+        order: 4,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-uiux',
+      },
     ],
   },
   {
@@ -241,9 +445,30 @@ export const SERIES_DATA: Series[] = [
     tags: ['Digital Marketing'],
     category: 'Marketing',
     episodes: [
-      { id: 'ep-m1', title: 'Marketing Fundamentals', duration: 2000, order: 1 },
-      { id: 'ep-m2', title: 'SEO & Content Strategy', duration: 2600, order: 2 },
-      { id: 'ep-m3', title: 'Social Media Marketing', duration: 2400, order: 3 },
+      {
+        id: 'ep-m1',
+        title: 'Marketing Fundamentals',
+        duration: 2000,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-marketing',
+      },
+      {
+        id: 'ep-m2',
+        title: 'SEO & Content Strategy',
+        duration: 2600,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-marketing',
+      },
+      {
+        id: 'ep-m3',
+        title: 'Social Media Marketing',
+        duration: 2400,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerFun,
+        seriesId: 'series-marketing',
+      },
     ],
   },
   {
@@ -254,9 +479,30 @@ export const SERIES_DATA: Series[] = [
     tags: ['Personal Finance'],
     category: 'Finance',
     episodes: [
-      { id: 'ep-f1', title: 'Budgeting Basics', duration: 1800, order: 1 },
-      { id: 'ep-f2', title: 'Investing Fundamentals', duration: 2400, order: 2 },
-      { id: 'ep-f3', title: 'Retirement Planning', duration: 2200, order: 3 },
+      {
+        id: 'ep-f1',
+        title: 'Budgeting Basics',
+        duration: 1800,
+        order: 1,
+        videoUrl: VIDEOS.forBiggerJoyrides,
+        seriesId: 'series-finance',
+      },
+      {
+        id: 'ep-f2',
+        title: 'Investing Fundamentals',
+        duration: 2400,
+        order: 2,
+        videoUrl: VIDEOS.forBiggerBlazes,
+        seriesId: 'series-finance',
+      },
+      {
+        id: 'ep-f3',
+        title: 'Retirement Planning',
+        duration: 2200,
+        order: 3,
+        videoUrl: VIDEOS.forBiggerEscapes,
+        seriesId: 'series-finance',
+      },
     ],
   },
 ];

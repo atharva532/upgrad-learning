@@ -4,10 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { Video, Series } from '../types/content.types';
 import {
   getContinueWatching,
+  getContinueWatchingSeries,
   getRecommendedSeries,
   getExplorationContent,
-  saveWatchProgress,
   getFirstUnfinishedEpisode,
+  hasSeriesProgress,
 } from '../services/contentService';
 import { getUserInterests } from '../services/interestService';
 import { ContinueWatching, RecommendationsSection, ExplorationSection } from './homepage';
@@ -18,6 +19,7 @@ export function Home() {
 
   // State for homepage sections
   const [continueVideo, setContinueVideo] = useState<Video | null>(null);
+  const [continueSeries, setContinueSeries] = useState<Series[]>([]);
   const [recommendations, setRecommendations] = useState<Series[]>([]);
   const [exploration, setExploration] = useState<Video[]>([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
@@ -26,9 +28,12 @@ export function Home() {
   useEffect(() => {
     async function loadHomepageContent() {
       try {
-        // Load continue watching
+        // Load continue watching (video + series)
         const continueWatching = await getContinueWatching();
         setContinueVideo(continueWatching);
+
+        const inProgressSeries = await getContinueWatchingSeries();
+        setContinueSeries(inProgressSeries);
 
         // Load user interests and get personalized series recommendations
         let interestNames: string[] = [];
@@ -39,7 +44,11 @@ export function Home() {
           console.warn('Could not fetch user interests, using defaults');
         }
         const recs = await getRecommendedSeries(interestNames);
-        setRecommendations(recs);
+
+        // Filter out series that the user has already started
+        // (those are shown in Continue Watching instead)
+        const filteredRecs = recs.filter((s) => !hasSeriesProgress(s));
+        setRecommendations(filteredRecs);
         setIsLoadingRecommendations(false);
 
         // Load exploration content
@@ -62,32 +71,24 @@ export function Home() {
   };
 
   const handleResume = (videoId: string) => {
-    // In production, navigate to video player
-    console.log('Resuming video:', videoId);
-    // Simulate progress update
-    saveWatchProgress(videoId, Math.min(100, (continueVideo?.progress || 0) + 10));
-    // Refresh continue watching to update UI
-    getContinueWatching().then(setContinueVideo);
+    navigate(`/watch/${videoId}`);
   };
 
   const handleSeriesClick = (seriesId: string) => {
-    const episode = getFirstUnfinishedEpisode(seriesId);
+    // Find the series from recommendations OR continue-watching
+    const seriesObj =
+      recommendations.find((s) => s.id === seriesId) ||
+      continueSeries.find((s) => s.id === seriesId);
+    const episode = seriesObj
+      ? getFirstUnfinishedEpisode(seriesObj)
+      : getFirstUnfinishedEpisode(seriesId);
     if (episode) {
-      // In production, navigate to video player with series context
-      console.log(
-        `Starting series ${seriesId} at episode ${episode.order}: ${episode.episodeTitle}`
-      );
       navigate(`/series/${seriesId}/episode/${episode.episodeId}`);
     }
   };
 
   const handleWatch = (videoId: string) => {
-    // In production, navigate to video player
-    console.log('Starting video:', videoId);
-    // Simulate starting a new video
-    saveWatchProgress(videoId, 5);
-    // Refresh continue watching
-    getContinueWatching().then(setContinueVideo);
+    navigate(`/watch/${videoId}`);
   };
 
   if (!user) {
@@ -132,7 +133,12 @@ export function Home() {
         </section>
 
         {/* Fixed Section Order: Continue Watching → Recommendations → Exploration */}
-        <ContinueWatching video={continueVideo} onResume={handleResume} />
+        <ContinueWatching
+          video={continueVideo}
+          series={continueSeries}
+          onResume={handleResume}
+          onSeriesClick={handleSeriesClick}
+        />
 
         <RecommendationsSection
           series={recommendations}
