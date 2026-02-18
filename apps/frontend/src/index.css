@@ -1430,7 +1430,7 @@ body {
 }
 
 .episode-list-item.active {
-  background: rgba(var(--primary-rgb, 99, 102, 241), 0.12);
+  background: rgba(91, 95, 199, 0.12);
   color: #ffffff;
   border-left: 3px solid var(--primary);
 }

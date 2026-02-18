@@ -23,7 +23,7 @@ export function VideoPlayer({
     if (videoRef.current && startTime && startTime > 0) {
       videoRef.current.currentTime = startTime;
     }
-  }, [startTime]);
+  }, [startTime, videoUrl]);
 
   const handleTimeUpdate = () => {
     const video = videoRef.current;

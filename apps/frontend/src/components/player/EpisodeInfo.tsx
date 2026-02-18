@@ -25,7 +25,7 @@ export function EpisodeInfo({
     <div className="episode-info">
       {seriesTitle && <span className="episode-series-label">{seriesTitle}</span>}
       <div className="episode-title-row">
-        {episodeOrder && <span className="episode-order-badge">EP {episodeOrder}</span>}
+        {episodeOrder != null && <span className="episode-order-badge">EP {episodeOrder}</span>}
         <h2 className="episode-title">{episodeTitle}</h2>
       </div>
       <div className="episode-meta">

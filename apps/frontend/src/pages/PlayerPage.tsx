@@ -24,7 +24,20 @@ async function apiFetch<T>(url: string): Promise<T> {
   const res = await fetch(url, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  const result: ApiResponse<T> = await res.json();
+
+  const contentType = res.headers.get('Content-Type') || '';
+  if (!res.ok || !contentType.includes('application/json')) {
+    const text = await res.text();
+    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+  }
+
+  let result: ApiResponse<T>;
+  try {
+    result = await res.json();
+  } catch {
+    throw new Error(`Failed to parse JSON response from ${url}`);
+  }
+
   if (!result.success || !result.data) {
     throw new Error(result.error || 'API request failed');
   }
@@ -48,6 +61,7 @@ export function PlayerPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showComplete, setShowComplete] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Fetch data based on mode
   useEffect(() => {
@@ -83,7 +97,7 @@ export function PlayerPage() {
     }
 
     loadContent();
-  }, [mode, videoId, seriesId, episodeId, navigate]);
+  }, [mode, videoId, seriesId, episodeId, navigate, retryCount]);
 
   // Handle time update for progress tracking
   const handleTimeUpdate = useCallback(
@@ -146,8 +160,7 @@ export function PlayerPage() {
 
   const handleRetry = () => {
     setError(null);
-    setLoading(true);
-    window.location.reload();
+    setRetryCount((c) => c + 1);
   };
 
   const handleRewatch = () => {
@@ -236,6 +249,7 @@ export function PlayerPage() {
           {/* Main player area */}
           <div className="player-main">
             <VideoPlayer
+              key={activeVideoUrl}
               videoUrl={activeVideoUrl}
               onTimeUpdate={handleTimeUpdate}
               onEnded={handleEnded}
