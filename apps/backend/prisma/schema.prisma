@@ -115,3 +115,44 @@ model AuditLog {
   @@index([userId, createdAt])
   @@index([action, createdAt])
 }
+
+// Standalone course (single video)
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  thumbnail   String   // URL to thumbnail image
+  duration    Int      // total seconds
+  category    String
+  description String?
+  videoUrl    String   // direct MP4 URL
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Multi-episode series
+model Series {
+  id          String    @id @default(uuid())
+  title       String
+  thumbnail   String    // URL to thumbnail image
+  description String
+  category    String
+  tags        String[]  // interest names for filtering
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  episodes    Episode[]
+}
+
+// Single episode within a series
+model Episode {
+  id        String   @id @default(uuid())
+  title     String
+  duration  Int      // seconds
+  order     Int      // 1-indexed position within series
+  videoUrl  String   // direct MP4 URL
+  seriesId  String
+  series    Series   @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([seriesId])
+  @@unique([seriesId, order])
+}

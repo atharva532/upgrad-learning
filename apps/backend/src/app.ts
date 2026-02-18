@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import authRoutes from './routes/auth.routes.js';
 import interestRoutes from './routes/interest.routes.js';
+import contentRoutes from './routes/content.routes.js';
 
 // Read version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -59,6 +60,7 @@ app.get('/', (_req: Request, res: Response) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/interests', interestRoutes);
+app.use('/api/content', contentRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

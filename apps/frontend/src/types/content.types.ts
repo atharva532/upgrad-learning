@@ -1,5 +1,5 @@
 /**
- * Content Types for Homepage
+ * Content Types for Homepage & Player
  */
 
 export interface Video {
@@ -10,6 +10,7 @@ export interface Video {
   progress?: number; // 0-100 percentage
   category: string;
   description?: string;
+  videoUrl: string; // direct MP4 URL
 }
 
 export interface WatchProgress {
@@ -23,6 +24,8 @@ export interface Episode {
   title: string;
   duration: number; // in seconds
   order: number; // 1-indexed position within series
+  videoUrl: string; // direct MP4 URL
+  seriesId: string;
 }
 
 export interface Series {
