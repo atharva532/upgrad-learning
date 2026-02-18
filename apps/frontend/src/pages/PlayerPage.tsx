@@ -63,7 +63,7 @@ export function PlayerPage() {
   const [showComplete, setShowComplete] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  // Fetch data based on mode
+  // Effect 1: Fetch series/course data (does NOT depend on episodeId)
   useEffect(() => {
     async function loadContent() {
       setLoading(true);
@@ -77,17 +77,6 @@ export function PlayerPage() {
         } else if (mode === 'series' && seriesId) {
           const seriesData = await apiFetch<Series>(`${API_BASE}/content/series/${seriesId}`);
           setSeries(seriesData);
-
-          // Find current episode
-          const ep = seriesData.episodes.find((e) => e.id === episodeId);
-          if (ep) {
-            setCurrentEpisode(ep);
-          } else if (seriesData.episodes.length > 0) {
-            // Default to first episode
-            const firstEp = seriesData.episodes[0];
-            setCurrentEpisode(firstEp);
-            navigate(`/series/${seriesId}/episode/${firstEp.id}`, { replace: true });
-          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load content');
@@ -97,7 +86,22 @@ export function PlayerPage() {
     }
 
     loadContent();
-  }, [mode, videoId, seriesId, episodeId, navigate, retryCount]);
+  }, [mode, videoId, seriesId, retryCount]);
+
+  // Effect 2: Resolve current episode from already-fetched series (no network call)
+  useEffect(() => {
+    if (!series) return;
+
+    const ep = series.episodes.find((e) => e.id === episodeId);
+    if (ep) {
+      setCurrentEpisode(ep);
+    } else if (series.episodes.length > 0) {
+      // Default to first episode if episodeId not found
+      const firstEp = series.episodes[0];
+      setCurrentEpisode(firstEp);
+      navigate(`/series/${seriesId}/episode/${firstEp.id}`, { replace: true });
+    }
+  }, [series, episodeId, seriesId, navigate]);
 
   // Handle time update for progress tracking
   const handleTimeUpdate = useCallback(
@@ -170,10 +174,29 @@ export function PlayerPage() {
     }
   };
 
+  // Shared header for all states so users can always navigate back
+  const pageHeader = (
+    <header className="player-header">
+      <button className="player-back-btn" onClick={() => navigate('/home')}>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path
+            d="M13 4L7 10l6 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span>Back to Home</span>
+      </button>
+    </header>
+  );
+
   // Error state
   if (error) {
     return (
       <div className="player-page">
+        {pageHeader}
         <div className="player-page-content">
           <VideoError message={error} onRetry={handleRetry} />
         </div>
@@ -185,6 +208,7 @@ export function PlayerPage() {
   if (loading) {
     return (
       <div className="player-page">
+        {pageHeader}
         <div className="player-page-content">
           <div className="player-loading">
             <div className="loading-spinner" />
@@ -199,6 +223,7 @@ export function PlayerPage() {
   if (showComplete && series) {
     return (
       <div className="player-page">
+        {pageHeader}
         <div className="player-page-content">
           <SeriesComplete
             seriesTitle={series.title}
@@ -220,6 +245,7 @@ export function PlayerPage() {
   if (!activeVideoUrl) {
     return (
       <div className="player-page">
+        {pageHeader}
         <div className="player-page-content">
           <VideoError message="No video URL available" onRetry={handleRetry} />
         </div>
@@ -229,20 +255,7 @@ export function PlayerPage() {
 
   return (
     <div className="player-page">
-      <header className="player-header">
-        <button className="player-back-btn" onClick={() => navigate('/home')}>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M13 4L7 10l6 6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Back to Home</span>
-        </button>
-      </header>
+      {pageHeader}
 
       <div className="player-page-content">
         <div className={`player-layout ${mode === 'series' ? 'has-sidebar' : ''}`}>
